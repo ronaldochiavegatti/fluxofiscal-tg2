@@ -198,8 +198,16 @@ services:
       start_period: 5s
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
+    # A MinIO retirou as imagens públicas do Docker Hub e do quay.io (a tag
+    # RELEASE.2025-04-08T15-41-24Z responde 401). A bitnamilegacy/minio:2025.4.8
+    # é o mesmo build (commit d0cada58, 08/04/2025), congelado e com o `mc` do
+    # healthcheck. Roda o binário direto, como root, para manter o volume em
+    # /data e o comando de antes; o entrypoint da Bitnami usaria outro caminho
+    # e o usuário 1001, que não escreve no volume já existente.
+    image: bitnamilegacy/minio:2025.4.8
     container_name: minio
+    user: "0:0"
+    entrypoint: ["minio"]
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-fiscalflow}

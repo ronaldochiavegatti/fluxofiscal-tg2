@@ -42,13 +42,11 @@ internet ──► Caddy :443 ──► fluxofiscal.<ip>.sslip.io      ──►
    ssh -t root@<IP-DA-VPS> bash /opt/fluxofiscal/deploy/definir-gemini.sh
    ```
 
-> **Imagem do MinIO:** a tag `quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z`
-> não existe mais nem no quay.io nem no Docker Hub (401). Numa VPS nova, leve a
-> imagem do cache local antes do `instalar.sh` (Git Bash):
->
-> ```bash
-> docker save quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z | gzip -1 | ssh root@<IP> 'gunzip | docker load'
-> ```
+> **Imagem do MinIO:** a MinIO retirou as imagens públicas (a tag
+> `quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z` responde 401). O compose usa
+> `bitnamilegacy/minio:2025.4.8`, o mesmo build, que ainda é baixável; numa VPS
+> que já tinha a imagem antiga, o `instalar.sh` só recria o contêiner, com o
+> mesmo volume e os mesmos dados.
 
 ## Atualizar depois de mudar o código
 
