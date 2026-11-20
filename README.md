@@ -197,3 +197,10 @@ Leia [`CONTRIBUTING.md`](CONTRIBUTING.md). Ao clonar, ative os hooks do projeto
 com `git config core.hooksPath .githooks`. Em resumo: ramo curto a partir da
 `main`, commits no padrão Conventional Commits, PR com a CI verde, mudança
 arriscada atrás de feature flag.
+
+## Direitos
+
+Copyright (c) 2026 Centro Estadual de Educação Tecnológica Paula Souza
+(CEETEPS) — Fatec Rio Preto. Todos os direitos reservados. O código é público
+só para consulta e verificação acadêmica do Trabalho de Graduação II; veja
+[LICENSE](LICENSE).
