@@ -1,0 +1,75 @@
+# ---------- Segredos ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# ---------- Node / frontend ----------
+node_modules/
+.vite/
+.turbo/
+coverage/
+*.tsbuildinfo
+services/frontend/dist/
+
+# ---------- Docker / dados locais ----------
+data/
+uploads/
+*.sqlite3
+
+# ---------- Observabilidade (dados de runtime) ----------
+infra/observability/**/data/
+infra/observability/**/wal/
+
+# ---------- Testes de carga / benchmarks ----------
+tests/load/results/
+resultados/
+
+# ---------- Artefatos do artigo ----------
+*.docx.bak
+*.pre-print-update.bak
+~$*.docx
+~$*.xlsx
+
+# ---------- Sistema operacional / editores ----------
+Thumbs.db
+desktop.ini
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.sample.json
+
+# Cobertura gerada pelo vitest
+app/services/frontend/coverage/
+
+# ---------- Claude Code (harness de agentes paralelos) ----------
+# O harness compartilhado (CLAUDE.md, .claude/agents, .claude/commands,
+# .claude/settings.json, .claude/PLAYBOOK.md) É versionado. Só ficam de fora:
+.claude/settings.local.json
+.claude/worktrees/
+# Override local de Compose para rodar vários worktrees em paralelo sem
+# colisão de container_name / portas (ver CLAUDE.md, "Trabalho paralelo")
+app/docker-compose.override.yml

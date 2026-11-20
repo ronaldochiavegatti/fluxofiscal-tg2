@@ -1,0 +1,102 @@
+name: Contratos entre serviços
+
+# Portão da US-47. Quebra de contrato entre serviços tem que aparecer no PR,
+# não em execução:
+#   1. o OpenAPI de cada serviço é comparado com o snapshot congelado em
+#      tools/contratos/snapshots/ — some rota, operação ou campo de resposta
+#      reprova, e a mensagem aponta os consumidores afetados;
+#   2. o contrato do envelope de eventos (ADR-0006) é testado — todo evento
+#      carrega `versao`, e versão desconhecida vira WARNING sem quebrar.
+#
+# Regravar um snapshot é uma mudança explícita: entra no diff do PR.
+
+on:
+  pull_request:
+    paths:
+      - "app/services/**"
+      - "tools/contratos/**"
+      - ".github/workflows/contratos.yml"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  # ------------------------------------------------------------------
+  # Contrato de resposta: OpenAPI atual x snapshot, por serviço
+  # ------------------------------------------------------------------
+  openapi:
+    name: Contrato OpenAPI · ${{ matrix.servico }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servico: [auth, billing, limits, documents, agent-orchestrator, insights, notifications]
+    env:
+      # documents cria o diretório de upload na importação do módulo.
+      UPLOAD_DIR: /tmp/contratos-uploads
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Instalar dependências do serviço
+        working-directory: app/services/${{ matrix.servico }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # create_engine(...) resolve o driver na importação; o snapshot não
+          # abre conexão, mas o import precisa do psycopg2.
+          pip install psycopg2-binary==2.9.10
+
+      - name: Extrair o OpenAPI atual
+        working-directory: app/services/${{ matrix.servico }}
+        env:
+          PYTHONPATH: .
+        run: python "$GITHUB_WORKSPACE/tools/contratos/extrair.py" openapi-atual.json
+
+      - name: Comparar com o snapshot congelado
+        working-directory: app/services/${{ matrix.servico }}
+        run: |
+          python "$GITHUB_WORKSPACE/tools/contratos/verificar.py" \
+            --servico ${{ matrix.servico }} \
+            --atual openapi-atual.json
+
+      # Publica o OpenAPI atual de cada serviço. Serve para o bootstrap dos
+      # snapshots e para regravar um snapshot quando a mudança de contrato é
+      # intencional — baixe `schema-<servico>` e mova para snapshots/.
+      - name: Publicar o OpenAPI atual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-${{ matrix.servico }}
+          path: app/services/${{ matrix.servico }}/openapi-atual.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # ------------------------------------------------------------------
+  # Contrato do envelope de eventos (ADR-0006)
+  # ------------------------------------------------------------------
+  eventos:
+    name: Contrato de eventos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar dependências
+        run: pip install pytest
+
+      - name: Testes do contrato (verificador + envelope de eventos)
+        run: pytest tools/contratos/ -q

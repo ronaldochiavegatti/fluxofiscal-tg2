@@ -1,0 +1,490 @@
+# Healthchecks e condições de dependência
+# ---------------------------------------
+# Sem healthcheck declarado, `docker compose up --wait` devolve o controle
+# assim que os contêineres estão *rodando* — não quando estão *prontos*. Os
+# serviços FastAPI sobem antes dos seus Postgres, e o gateway responde 502 até
+# que os upstreams comecem a escutar.
+#
+# As imagens são python:3.11-slim, sem curl. O healthcheck usa a própria
+# biblioteca padrão do Python, o que evita instalar pacote só para isso.
+
+x-healthcheck-fastapi: &healthcheck-fastapi
+  test:
+    - CMD
+    - python
+    - -c
+    - |
+      import sys, urllib.request
+      try:
+          with urllib.request.urlopen("http://localhost:8000/health", timeout=3) as r:
+              sys.exit(0 if r.status == 200 else 1)
+      except Exception:
+          sys.exit(1)
+  interval: 5s
+  timeout: 5s
+  retries: 20
+  start_period: 15s
+
+services:
+  auth:
+    build: ./services/auth
+    container_name: auth_service
+    env_file: .env
+    depends_on:
+      auth_db:
+        condition: service_healthy
+    healthcheck: *healthcheck-fastapi
+
+  auth_db:
+    image: postgres:16-alpine
+    container_name: auth_db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  billing:
+    build: ./services/billing
+    container_name: billing_service
+    environment:
+      # Pilha local é a demo do TG: saldo nunca bloqueia nem é debitado.
+      # Para exercitar a cobrança, suba com BILLING_TOKENS_ILIMITADOS=false.
+      - BILLING_TOKENS_ILIMITADOS=${BILLING_TOKENS_ILIMITADOS:-true}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+    depends_on:
+      billing_db:
+        condition: service_healthy
+    # Não depende de `unleash`: a indisponibilidade do serviço de flags nunca
+    # atrasa nem derruba a inicialização (ADR-0008).
+    healthcheck: *healthcheck-fastapi
+
+  billing_db:
+    image: postgres:16-alpine
+    container_name: billing_db
+    environment:
+      POSTGRES_DB: billing_db
+      POSTGRES_USER: billing_user
+      POSTGRES_PASSWORD: billing_password
+    volumes:
+      - billing_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U billing_user -d billing_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  documents:
+    build: ./services/documents
+    container_name: documents_service
+    environment:
+      - LIMITS_BASE_URL=http://limits:8000
+      - AGENT_BASE_URL=http://agent:8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+      # US-19 MinIO / US-20 Mongo / US-18 fila. Inertes sem as flags
+      # `storage-minio`, `documentos-persistidos` e `ocr-assincrono`.
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-http://minio:9000}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-fiscalflow}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-troque-esta-senha}
+      - MINIO_BUCKET=${MINIO_BUCKET:-fiscalflow-documents}
+      - MONGO_URL=${MONGO_URL:-}
+      - MONGO_DB=${MONGO_DB:-fluxofiscal}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/1}
+      - INTERNO_TOKEN=${INTERNO_TOKEN:-}
+    volumes:
+      - documents_data:/data
+    # Não declara depends_on: só conversa com limits, agent, redis e mongo em
+    # tempo de requisição, não na inicialização.
+    healthcheck: *healthcheck-fastapi
+
+  limits:
+    build: ./services/limits
+    container_name: limits_service
+    environment:
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+      # US-21: publicação de eventos via Outbox. Inerte sem a flag.
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - EVENTOS_STREAM=${EVENTOS_STREAM:-fluxofiscal:eventos}
+      - FORCAR_EVENTOS_OUTBOX=${FORCAR_EVENTOS_OUTBOX:-}
+    depends_on:
+      limits_db:
+        condition: service_healthy
+    healthcheck: *healthcheck-fastapi
+
+  limits_db:
+    image: postgres:16-alpine
+    container_name: limits_db
+    environment:
+      POSTGRES_DB: limits_db
+      POSTGRES_USER: limits_user
+      POSTGRES_PASSWORD: limits_password
+    volumes:
+      - limits_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U limits_user -d limits_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  agent_db:
+    image: pgvector/pgvector:pg16
+    container_name: agent_db
+    environment:
+      POSTGRES_DB: agent_db
+      POSTGRES_USER: agent_user
+      POSTGRES_PASSWORD: agent_password
+    volumes:
+      - agent_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_user -d agent_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  agent:
+    build:
+      context: ./services/agent-orchestrator
+      dockerfile: Dockerfile
+    container_name: agent_service
+    environment:
+      - LIMITS_BASE_URL=http://limits:8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      - GEMINI_EMBEDDING_MODEL=${GEMINI_EMBEDDING_MODEL:-gemini-embedding-001}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+    depends_on:
+      agent_db:
+        condition: service_healthy
+      limits:
+        condition: service_healthy
+    # O seed da base de conhecimento gera embeddings na inicialização, então a
+    # primeira subida com GEMINI_API_KEY configurada demora mais que as demais.
+    healthcheck:
+      <<: *healthcheck-fastapi
+      start_period: 40s
+
+  unleash_db:
+    image: postgres:16-alpine
+    container_name: unleash_db
+    environment:
+      POSTGRES_DB: unleash
+      POSTGRES_USER: unleash_user
+      POSTGRES_PASSWORD: unleash_password
+    volumes:
+      - unleash_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unleash_user -d unleash"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  # Feature flags (US-15 / ADR-0008). Nenhum outro serviço declara
+  # `depends_on: unleash` — a indisponibilidade do Unleash nunca atrasa nem
+  # derruba a inicialização de ninguém, só faz as flags caírem no padrão.
+  #
+  # Os tokens de cliente e de frontend são seedados diretamente no boot via
+  # INIT_CLIENT_API_TOKENS / INIT_FRONTEND_API_TOKENS — sem isso, cada subida
+  # exigiria configurar o Unleash pela UI antes do SDK conseguir falar com
+  # ele. Formato do token: <projeto>:<ambiente>.<segredo>.
+  unleash:
+    image: unleashorg/unleash-server:6.2
+    container_name: unleash
+    environment:
+      DATABASE_HOST: unleash_db
+      DATABASE_NAME: unleash
+      DATABASE_USERNAME: unleash_user
+      DATABASE_PASSWORD: unleash_password
+      DATABASE_SSL: "false"
+      INIT_CLIENT_API_TOKENS: ${UNLEASH_API_TOKEN:-default:development.unleash-insecure-dev-secret}
+      INIT_FRONTEND_API_TOKENS: ${UNLEASH_FRONTEND_TOKEN:-default:development.unleash-insecure-dev-frontend-secret}
+    ports:
+      - "4242:4242"
+    depends_on:
+      unleash_db:
+        condition: service_healthy
+    healthcheck:
+      # Imagem sem curl/wget; node vem com o runtime.
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:4242/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # ==================================================================
+  # Onda 3 — infraestrutura assíncrona, persistência e eventos
+  # (ADR-0003 Redis/Celery, ADR-0004 MinIO, ADR-0005 MongoDB,
+  #  ADR-0006 Redis Streams, ADR-0009 Insights). Preparação da onda:
+  # os contêineres sobem e ficam saudáveis; a lógica que os usa entra
+  # nas US-18 a US-23.
+  # ==================================================================
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z
+    container_name: minio
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-fiscalflow}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-troque-esta-senha}
+      # Chave de KMS estática: sem ela o MinIO recusa o PutObject com
+      # SSE-S3 (`ServerSideEncryption=AES256`) que o documents envia.
+      # Formato <nome>:<32 bytes em base64>. Só para dev — fora daqui, KES.
+      MINIO_KMS_SECRET_KEY: ${MINIO_KMS_SECRET_KEY:-fiscalflow-dev:ZmlzY2FsZmxvdy1pbnNlY3VyZS1kZXYta21zLWtleSE=}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-fiscalflow}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-troque-esta-senha}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  insights_db:
+    image: postgres:16-alpine
+    container_name: insights_db
+    environment:
+      POSTGRES_DB: insights_db
+      POSTGRES_USER: insights_user
+      POSTGRES_PASSWORD: insights_password
+    volumes:
+      - insights_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U insights_user -d insights_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  insights:
+    build: ./services/insights
+    container_name: insights_service
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - EVENTOS_STREAM=${EVENTOS_STREAM:-fluxofiscal:eventos}
+      - EVENTOS_GRUPO=${EVENTOS_GRUPO:-insights}
+      - FORCAR_EVENTOS_OUTBOX=${FORCAR_EVENTOS_OUTBOX:-}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+    depends_on:
+      insights_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck: *healthcheck-fastapi
+
+  worker:
+    build: ./services/worker
+    container_name: worker_service
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/1}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/2}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      # US-18: a tarefa delega o pipeline de extração ao documents.
+      - DOCUMENTS_BASE_URL=${DOCUMENTS_BASE_URL:-http://documents:8000}
+      - INTERNO_TOKEN=${INTERNO_TOKEN:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.celery_app inspect ping -t 10 2>&1 | grep -q pong"]
+      interval: 10s
+      timeout: 15s
+      retries: 10
+      start_period: 20s
+
+  notifications_db:
+    image: postgres:16-alpine
+    container_name: notifications_db
+    environment:
+      POSTGRES_DB: notifications_db
+      POSTGRES_USER: notifications_user
+      POSTGRES_PASSWORD: notifications_password
+    volumes:
+      - notifications_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notifications_user -d notifications_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  notifications:
+    build: ./services/notifications
+    container_name: notifications_service
+    environment:
+      - DATABASE_URL=${NOTIFICATIONS_DATABASE_URL:-postgresql+psycopg2://notifications_user:notifications_password@notifications_db:5432/notifications_db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - EVENTOS_STREAM=${EVENTOS_STREAM:-fluxofiscal:eventos}
+      - EVENTOS_GRUPO=${EVENTOS_GRUPO_NOTIFICATIONS:-notifications}
+      - FORCAR_EVENTOS_OUTBOX=${FORCAR_EVENTOS_OUTBOX:-}
+      - UNLEASH_URL=${UNLEASH_URL:-}
+      - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
+      - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+      - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
+    depends_on:
+      notifications_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck: *healthcheck-fastapi
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: api_gateway
+    ports:
+      - "8000:80"
+    depends_on:
+      auth:
+        condition: service_healthy
+      billing:
+        condition: service_healthy
+      documents:
+        condition: service_healthy
+      limits:
+        condition: service_healthy
+      agent:
+        condition: service_healthy
+      insights:
+        condition: service_healthy
+      notifications:
+        condition: service_healthy
+    # Não espera o unleash: o gateway só faz proxy para ele (rota
+    # /unleash-frontend/) e não precisa que esteja de pé para ficar saudável.
+    healthcheck:
+      # curl vem instalado no Dockerfile do gateway. Aponta para /health, que o
+      # nginx responde localmente: o gateway só precisa provar que está
+      # servindo, e o Compose já garantiu que os upstreams estão saudáveis.
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+  frontend:
+    build: ./services/frontend
+    container_name: frontend_service
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+      # SDK do navegador fala com o Frontend API do Unleash através do
+      # gateway (rota /unleash-frontend/), nunca direto — evita expor um
+      # token com mais escopo do que o necessário para o cliente.
+      - VITE_UNLEASH_FRONTEND_URL=http://localhost:8000/unleash-frontend
+      - VITE_UNLEASH_FRONTEND_TOKEN=${UNLEASH_FRONTEND_TOKEN:-default:development.unleash-insecure-dev-frontend-secret}
+      - VITE_UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-fluxofiscal}
+    ports:
+      - "3000:5173"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: prometheus
+    volumes:
+      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./services/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      auth:
+        condition: service_healthy
+      billing:
+        condition: service_healthy
+      limits:
+        condition: service_healthy
+      documents:
+        condition: service_healthy
+      agent:
+        condition: service_healthy
+      insights:
+        condition: service_healthy
+      notifications:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  auth_db_data:
+  billing_db_data:
+  documents_data:
+  limits_db_data:
+  agent_db_data:
+  prometheus_data:
+  unleash_db_data:
+  redis_data:
+  minio_data:
+  mongo_data:
+  insights_db_data:
+  notifications_db_data:

@@ -1,0 +1,91 @@
+DANFSe v1.0 - Documento Auxiliar da NFS-e
+NFS-e Nacional - Prefeitura do Município de São Paulo
+EMITIDA EM AMBIENTE DE PRODUÇÃO RESTRITA - SEM VALOR FISCAL
+
+Chave de Acesso da NFS-e: 35503081212345678000190000000000000826089493164022
+
+Número da NFS-e: 8
+Competência da NFS-e: 26/08/2026
+Data e Hora da emissão da NFS-e: 26/08/2026 09:56:44
+Número da DPS: 8
+Série da DPS: 900
+Data e Hora da emissão da DPS: 26/08/2026 09:56:44
+
+EMITENTE DA NFS-e  -  Prestador do Serviço
+------------------------------------------
+CNPJ / CPF / NIF: 12.345.678/0001-90
+Inscrição Municipal: 1.234.567-8
+Telefone: (11) 3456-7890
+Nome / Nome Empresarial: Ronaldo Chiavegatti Serviços de TI MEI
+E-mail: contato@rcti.com.br
+Endereço: Rua das Palmeiras, 120 - Sala 4, Vila Mariana
+Município: São Paulo - SP
+CEP: 04101-000
+Simples Nacional na Data de Competência: Optante - Microempreendedor Individual (MEI)
+Regime de Apuração Tributária pelo SN: -
+
+TOMADOR DO SERVIÇO
+------------------
+CNPJ / CPF / NIF: 16.180.339/0001-57
+Inscrição Municipal: 4.567.890-1
+Telefone: (11) 5017-4466
+Nome / Nome Empresarial: Auto Peças Rota 66 Ltda
+E-mail: compras@rota66pecas.com.br
+Endereço: Av. Jabaquara, 880, Saúde
+Município: São Paulo - SP
+CEP: 04046-100
+
+INTERMEDIÁRIO DO SERVIÇO
+------------------------
+NÃO IDENTIFICADO NA NFS-e
+
+SERVIÇO PRESTADO
+----------------
+Código de Tributação Nacional: 01.06.01 - Assessoria e consultoria em informática
+Código de Tributação Municipal: 01060
+Local da Prestação: São Paulo - SP
+País da Prestação: Brasil
+Descrição do Serviço: Consultoria em segurança da informação e adequação à LGPD.
+
+TRIBUTAÇÃO MUNICIPAL
+--------------------
+Tributação do ISSQN: Operação Tributável
+País Resultado da Prestação do Serviço: -
+Município de Incidência do ISSQN: São Paulo - SP
+Regime Especial de Tributação: Nenhum
+Valor do Serviço: R$ 5.600,00
+Desconto Incondicionado: -
+Total Deduções/Reduções: -
+Cálculo do BM: -
+BC ISSQN: -
+Alíquota Aplicada: -
+Retenção do ISSQN: Não Retido
+ISSQN Apurado: -
+
+TRIBUTAÇÃO FEDERAL
+------------------
+IRRF: -
+Contribuição Previdenciária - Retida: -
+CSLL: -
+PIS: -
+COFINS: -
+
+VALOR TOTAL DA NFS-E
+--------------------
+Valor do Serviço: R$ 5.600,00
+Desconto Condicionado: R$ 0,00
+Desconto Incondicionado: R$ 0,00
+ISSQN Retido: -
+IRRF, CP, CSLL - Retidos: R$ 0,00
+PIS/COFINS Retidos: -
+Valor Líquido da NFS-e: R$ 5.600,00
+
+TOTAIS APROXIMADOS DOS TRIBUTOS
+-------------------------------
+Federais: -
+Estaduais: -
+Municipais: -
+
+INFORMAÇÕES COMPLEMENTARES
+--------------------------
+Prestador optante pelo SIMEI. ISSQN e tributos federais recolhidos mensalmente em valor fixo no DAS-MEI (LC 123/2006, art. 18-A). Não há retenção na fonte.

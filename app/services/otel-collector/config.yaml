@@ -1,0 +1,45 @@
+# OpenTelemetry Collector — US-12 / ADR-0007.
+#
+# É o ponto único onde o dado pessoal sai do rastro antes de ser armazenado:
+# a instrumentação automática do FastAPI e do SQLAlchemy anexa atributos como
+# a query SQL, que pode conter e-mail ou CNPJ.
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch: {}
+
+  # Atributos proibidos em span (docs/observabilidade/README.md §3).
+  attributes/scrub:
+    actions:
+      - key: db.statement
+        action: delete
+      - key: db.query.text
+        action: delete
+      - key: user.email
+        action: delete
+      - key: enduser.id
+        action: delete
+      - key: http.request.header.authorization
+        action: delete
+
+exporters:
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [attributes/scrub, batch]
+      exporters: [otlp/tempo, debug]

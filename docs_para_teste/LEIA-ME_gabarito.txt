@@ -1,0 +1,68 @@
+Documentos para teste manual (OCR/Gemini + venda x compra)
+=============================================================
+
+RESETAR DADOS ANTES DE TESTAR
+------------------------------
+O Dashboard tem um botão "Resetar dados de teste" (vermelho, no topo). Ele
+apaga PERMANENTEMENTE, para o e-mail logado: todas as vendas e compras no
+Limits, o saldo de tokens (volta a 1000), os documentos indexados no RAG do
+agente, os arquivos enviados no Documents Service e a lista de documentos
+salva no navegador. É preciso digitar "RESETAR" para confirmar. Use antes de
+cada rodada de testes para começar do zero.
+
+
+PARTE 1 — Extração (valor, data, CNPJ) com documentos REAIS
+--------------------------------------------------------------
+Na versão privada do projeto havia aqui 3 DANFEs reais, de compras de órgãos
+federais publicadas no Portal da Transparência (portaldatransparencia.gov.br)
+e geradas pela chave de acesso no meudanfe.com.br. Elas não são distribuídas
+nesta cópia pública, por serem documentos de empresas reais. Para repetir o
+teste, baixe qualquer DANFE público pelo mesmo caminho e confira valor, data e
+CNPJ do emitente. O teste controlado do artigo (pasta teste_controlado/) usa
+só notas sintéticas e não depende delas.
+
+
+PARTE 2 — Detecção automática de venda x compra
+--------------------------------------------------
+Os 2 arquivos abaixo são sintéticos, criados especificamente para testar a
+detecção automática, usando o MESMO CNPJ que já vem configurado por padrão
+no campo "Meu CNPJ" da barra lateral (12.345.678/0001-90). Não precisa
+mudar nada antes de enviá-los.
+
+4) teste_venda_emitente.png
+   O CNPJ demo aparece como EMITENTE (prestador do serviço).
+   Emitente: Ronaldo Chiavegatti Serviços de TI MEI — CNPJ 12.345.678/0001-90
+   Destinatário: Empresa Cliente Exemplo Ltda — CNPJ 98.765.432/0001-10
+   Data de emissão: 15/08/2026
+   Valor total: R$ 1.850,00
+   Esperado ao enviar: o sistema detecta sozinho "Venda (entrada de
+   receita)" e mostra a mensagem em azul confirmando a detecção automática.
+
+5) teste_compra_destinatario.png
+   O CNPJ demo aparece como DESTINATÁRIO (quem comprou).
+   Emitente: Papelaria Central Suprimentos Ltda — CNPJ 55.111.222/0001-33
+   Destinatário: Ronaldo Chiavegatti Serviços de TI MEI — CNPJ 12.345.678/0001-90
+   Data de emissão: 16/08/2026
+   Valor total: R$ 430,00
+   Esperado ao enviar: o sistema detecta sozinho "Compra (despesa)".
+
+Depois de confirmar os dois, confira no Dashboard:
+- Faturamento anual (vendas) deve ter subido R$ 1.850,00, e NÃO os R$ 430,00
+  da compra.
+- Despesas anuais (compras) deve mostrar R$ 430,00.
+- Saldo líquido deve ser R$ 1.850,00 − R$ 430,00 = R$ 1.420,00.
+- % do limite MEI deve refletir só a venda, não a soma dos dois.
+Pergunte também ao Agente Contábil "quanto vendi e quanto comprei esse
+ano?" para conferir se ele responde os dois valores separados corretamente.
+
+
+Como testar
+-------------
+1. Suba a stack, se ainda não estiver rodando: docker compose up -d
+   (dentro de app/).
+2. Acesse http://localhost:3000, entre na demo.
+3. (Opcional) Clique em "Resetar dados de teste" no Dashboard para começar
+   do zero.
+4. Vá em "Upload", envie cada arquivo, confira os campos extraídos contra o
+   gabarito acima e confirme.
+5. Confira o Dashboard e o Agente Contábil depois de cada confirmação.

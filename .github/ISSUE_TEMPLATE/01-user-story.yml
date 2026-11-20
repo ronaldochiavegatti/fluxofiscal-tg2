@@ -1,0 +1,84 @@
+name: "História de usuário"
+description: "Incremento de valor descrito no formato INVEST com critérios de aceite em Gherkin."
+title: "US-000 — Como <persona>, quero <ação>, para <benefício>"
+labels: ["tipo:história"]
+body:
+  - type: input
+    id: epico
+    attributes:
+      label: Épico
+      description: "EP01 Plataforma · EP02 Observabilidade · EP03 Feature Flags · EP04 Arquitetura Assíncrona · EP05 Dashboard · EP06 Ritmo de Vendas · EP07 Gestão MEI · EP08 Contexto do Agente · EP09 Bounded Contexts · EP10 Segurança e LGPD"
+      placeholder: "EP05 — Dashboard MEI v2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: persona
+    attributes:
+      label: Persona
+      options:
+        - "MEI prestador de serviços (Márcia)"
+        - "MEI comerciante (Douglas)"
+        - "Desenvolvedor / mantenedor da plataforma"
+        - "Operador / SRE da plataforma"
+        - "Orientador / banca avaliadora"
+    validations:
+      required: true
+
+  - type: textarea
+    id: narrativa
+    attributes:
+      label: Narrativa
+      value: |
+        **Como** <persona>
+        **quero** <ação>
+        **para** <benefício mensurável>
+    validations:
+      required: true
+
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite (Gherkin)
+      value: |
+        ```gherkin
+        Cenário: <nome do cenário>
+          Dado que <contexto>
+          Quando <ação>
+          Então <resultado observável>
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: valor
+    attributes:
+      label: Como medimos que deu certo
+      description: "Métrica, painel do Grafana, resultado de teste ou evidência que comprova o valor entregue."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pontos
+    attributes:
+      label: Estimativa (Fibonacci)
+      options: ["1", "2", "3", "5", "8", "13", "precisa quebrar"]
+    validations:
+      required: true
+
+  - type: input
+    id: flag
+    attributes:
+      label: Feature flag
+      description: "Nome da flag que protege a entrega, ou 'n/a'."
+      placeholder: "dashboard-v2"
+
+  - type: checkboxes
+    id: dor
+    attributes:
+      label: Definition of Ready
+      options:
+        - label: "Critérios de aceite escritos e sem ambiguidade"
+        - label: "Dependências técnicas identificadas"
+        - label: "Cabe em uma onda (se não couber, quebrar em histórias menores)"
+        - label: "Forma de medir o resultado definida"

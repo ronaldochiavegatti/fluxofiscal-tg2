@@ -1,0 +1,38 @@
+#!/bin/sh
+# Substituto local da proteção de ramo do GitHub.
+#
+# Proteção de ramo em repositório privado exige GitHub Pro, então este hook
+# faz o papel dela no cliente. Ele NÃO é equivalente: pode ser contornado com
+# --no-verify e não vale para merges feitos pela interface web. É uma rede de
+# segurança contra o engano honesto, não um controle de acesso.
+#
+# Ativado por: git config core.hooksPath .githooks
+
+ramo_protegido="main"
+remoto="$1"
+
+while read -r _ref_local _sha_local ref_remoto _sha_remoto; do
+    case "$ref_remoto" in
+        refs/heads/"$ramo_protegido")
+            if [ "$PERMITIR_PUSH_NA_MAIN" = "1" ]; then
+                echo "pre-push: push direto na $ramo_protegido liberado por PERMITIR_PUSH_NA_MAIN=1." >&2
+                exit 0
+            fi
+            echo "" >&2
+            echo "  Push direto na '$ramo_protegido' bloqueado (remoto: $remoto)." >&2
+            echo "" >&2
+            echo "  O fluxo do projeto é trunk-based com Pull Request (ADR-0002):" >&2
+            echo "" >&2
+            echo "    git switch -c feat/<issue>-<resumo>" >&2
+            echo "    git push -u origin feat/<issue>-<resumo>" >&2
+            echo "    gh pr create --fill" >&2
+            echo "" >&2
+            echo "  Se este push é mesmo intencional:" >&2
+            echo "    PERMITIR_PUSH_NA_MAIN=1 git push" >&2
+            echo "" >&2
+            exit 1
+            ;;
+    esac
+done
+
+exit 0

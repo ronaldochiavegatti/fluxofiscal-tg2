@@ -1,0 +1,140 @@
+name: Benchmarks noturnos
+
+# Este workflow é a fonte dos números da seção "Resultados e Discussões" do
+# artigo. Ele roda contra o ambiente real (docker compose) e produz, de forma
+# reprodutível e datada:
+#   1. acurácia da extração de dados de notas fiscais, campo a campo;
+#   2. qualidade da recuperação do RAG (recall@1, recall@3, MRR);
+#   3. latência ponta a ponta dos fluxos principais;
+#   4. resultado dos testes de carga com k6 contra os SLOs declarados.
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 03:00 em Brasília
+  workflow_dispatch:
+    inputs:
+      com_gemini:
+        description: "Usar a API real do Gemini (consome cota)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: app
+
+jobs:
+  # Os conjuntos de referência e os cenários de carga são implementados nas
+  # US-14 (k6 e SLOs) e US-04 (suíte de testes). Enquanto os scripts não
+  # existirem, este workflow é pulado com aviso explícito, em vez de falhar
+  # todas as noites — o histórico de execuções precisa continuar legível.
+  verificar:
+    name: Os benchmarks já existem?
+    runs-on: ubuntu-latest
+    outputs:
+      pronto: ${{ steps.checar.outputs.pronto }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: checar
+        run: |
+          faltando=""
+          for arquivo in \
+            tests/benchmarks/extracao.py \
+            tests/benchmarks/rag.py \
+            tests/benchmarks/verificar_slos.py \
+            tests/benchmarks/gerar_tabelas.py \
+            tests/load/perfil-mei.js
+          do
+            [ -f "$arquivo" ] || faltando="$faltando $arquivo"
+          done
+
+          if [ -z "$faltando" ]; then
+            echo "pronto=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pronto=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Faltam os scripts:$faltando — implementados nas US-04 e US-14. Workflow pulado de propósito."
+          fi
+
+  benchmarks:
+    name: Acurácia, recuperação e latência
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: verificar
+    if: needs.verificar.outputs.pronto == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Preparar ambiente
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          CHAVE: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          cp .env.example .env
+          if [ "${{ inputs.com_gemini }}" = "true" ] && [ -n "$CHAVE" ]; then
+            echo "GEMINI_API_KEY=$CHAVE" >> .env
+            echo "modo=gemini-real" >> "$GITHUB_ENV"
+          else
+            echo "modo=demo" >> "$GITHUB_ENV"
+          fi
+          docker compose up -d --build --wait --wait-timeout 720
+
+      - name: Benchmark de extração de documentos
+        run: |
+          pip install httpx rich
+          python tests/benchmarks/extracao.py \
+            --gabarito docs_para_teste/LEIA-ME_gabarito.txt \
+            --entrada docs_para_teste/ \
+            --saida resultados/extracao.json
+
+      - name: Benchmark de recuperação do RAG
+        run: |
+          python tests/benchmarks/rag.py \
+            --perguntas tests/benchmarks/golden_set_mei.yaml \
+            --saida resultados/rag.json
+
+      - name: Testes de carga (k6)
+        uses: grafana/setup-k6-action@v1
+      - name: Executar cenários k6
+        run: |
+          mkdir -p resultados
+          # Perfil completo da US-14: 50 VUs por 10 min + estresse até 200 VUs.
+          # Os scripts escrevem resultados/perfil-mei.json e resultados/estresse.json
+          # via handleSummary.
+          k6 run tests/load/perfil-mei.js
+          k6 run tests/load/estresse.js
+
+      - name: Verificar SLOs
+        run: |
+          python tests/benchmarks/verificar_slos.py \
+            --entrada resultados --slos docs/observabilidade/slos.yaml --modo gate
+
+      - name: Gerar tabelas em Markdown para o artigo
+        run: |
+          python tests/benchmarks/gerar_tabelas.py \
+            --entrada resultados/ \
+            --saida resultados/tabelas-artigo.md
+          cat resultados/tabelas-artigo.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks-${{ github.run_number }}-${{ env.modo }}
+          path: resultados/
+          retention-days: 180 # sobrevive até a defesa do TG
+
+      - name: Logs em caso de falha
+        if: failure()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose logs --tail=300
+
+      - name: Derrubar o ambiente
+        if: always()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose down -v

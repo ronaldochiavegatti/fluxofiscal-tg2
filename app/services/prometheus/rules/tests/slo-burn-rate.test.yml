@@ -1,0 +1,71 @@
+# Testes de comportamento das regras geradas (US-13).
+# Rodados por `promtool test rules` na CI (observabilidade.yml).
+#
+# Provam os dois cenários do critério de aceite da US-13:
+#   - erro sustentado acima do orçamento DISPARA a queima de página;
+#   - ruído de curta duração (uma janela só) NÃO dispara.
+
+rule_files:
+  - ../slo-burn-rate.yml
+
+evaluation_interval: 1m
+
+tests:
+  # -------------------------------------------------------------------------
+  - name: erro sustentado de 10% no Limits dispara a queima
+    interval: 1m
+    input_series:
+      - series: 'http_requests_total{job="limits", status="200"}'
+        values: "0+90x120"
+      - series: 'http_requests_total{job="limits", status="500"}'
+        values: "0+10x120"
+    alert_rule_test:
+      # 10% de erro sustentado estoura o orçamento em todas as janelas: as duas
+      # de página (queima-rapida e queima-media) e as duas de ticket
+      # (queima-lenta), para os dois SLOs cujo tráfego está sendo servido.
+      - eval_time: 25m
+        alertname: SLOQueimaDeOrcamento
+        exp_alerts:
+          - exp_labels: { severity: pagina, slo: limits-disponivel, janela: queima-rapida }
+            exp_annotations:
+              summary: "SLO limits-disponivel queimando orçamento de erro (queima-rapida, 14.4x)"
+              description: "A taxa de erro do SLO limits-disponivel está acima de 14.4x o orçamento nas janelas de 1h e 5m. Objetivo: 0.9990."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+          - exp_labels: { severity: pagina, slo: limits-disponivel, janela: queima-media }
+            exp_annotations:
+              summary: "SLO limits-disponivel queimando orçamento de erro (queima-media, 6.0x)"
+              description: "A taxa de erro do SLO limits-disponivel está acima de 6.0x o orçamento nas janelas de 6h e 30m. Objetivo: 0.9990."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+          - exp_labels: { severity: ticket, slo: limits-disponivel, janela: queima-lenta }
+            exp_annotations:
+              summary: "SLO limits-disponivel queimando orçamento de erro (queima-lenta, 1.0x)"
+              description: "A taxa de erro do SLO limits-disponivel está acima de 1.0x o orçamento nas janelas de 3d e 6h. Objetivo: 0.9990."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+          - exp_labels: { severity: pagina, slo: gateway-disponivel, janela: queima-rapida }
+            exp_annotations:
+              summary: "SLO gateway-disponivel queimando orçamento de erro (queima-rapida, 14.4x)"
+              description: "A taxa de erro do SLO gateway-disponivel está acima de 14.4x o orçamento nas janelas de 1h e 5m. Objetivo: 0.9950."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+          - exp_labels: { severity: pagina, slo: gateway-disponivel, janela: queima-media }
+            exp_annotations:
+              summary: "SLO gateway-disponivel queimando orçamento de erro (queima-media, 6.0x)"
+              description: "A taxa de erro do SLO gateway-disponivel está acima de 6.0x o orçamento nas janelas de 6h e 30m. Objetivo: 0.9950."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+          - exp_labels: { severity: ticket, slo: gateway-disponivel, janela: queima-lenta }
+            exp_annotations:
+              summary: "SLO gateway-disponivel queimando orçamento de erro (queima-lenta, 1.0x)"
+              description: "A taxa de erro do SLO gateway-disponivel está acima de 1.0x o orçamento nas janelas de 3d e 6h. Objetivo: 0.9950."
+              runbook_url: "https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md"
+
+  # -------------------------------------------------------------------------
+  - name: pico de 1 minuto nao dispara (so a janela curta queima)
+    interval: 1m
+    input_series:
+      - series: 'http_requests_total{job="limits", status="200"}'
+        values: "0+100x120"
+      - series: 'http_requests_total{job="limits", status="500"}'
+        values: "0x61 15x59"
+    alert_rule_test:
+      - eval_time: 65m
+        alertname: SLOQueimaDeOrcamento
+        exp_alerts: []

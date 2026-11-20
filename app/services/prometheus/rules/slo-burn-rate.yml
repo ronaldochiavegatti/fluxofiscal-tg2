@@ -1,0 +1,217 @@
+# GERADO por tools/observabilidade/gerar_alertas.py — NÃO EDITE À MÃO.
+# Fonte: docs/observabilidade/slos.yaml. Para atualizar:
+#   python tools/observabilidade/gerar_alertas.py
+# A CI (observabilidade.yml) reprova se este arquivo sair de sincronia.
+
+groups:
+- name: slo_sli_erro_rapido
+  interval: 30s
+  rules:
+  - record: slo:sli_erro:taxa5m
+    expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa30m
+    expr: sum(rate(http_requests_total{status=~"5.."}[30m])) / sum(rate(http_requests_total[30m]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa1h
+    expr: sum(rate(http_requests_total{status=~"5.."}[1h])) / sum(rate(http_requests_total[1h]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa6h
+    expr: sum(rate(http_requests_total{status=~"5.."}[6h])) / sum(rate(http_requests_total[6h]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa5m
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[5m])) / sum(rate(http_requests_total{job="limits"}[5m]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa30m
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[30m])) / sum(rate(http_requests_total{job="limits"}[30m]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa1h
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[1h])) / sum(rate(http_requests_total{job="limits"}[1h]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa6h
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[6h])) / sum(rate(http_requests_total{job="limits"}[6h]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa5m
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[5m])) / sum(rate(http_requests_total{job="insights"}[5m]))
+    labels:
+      slo: insights-disponivel
+  - record: slo:sli_erro:taxa30m
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[30m])) / sum(rate(http_requests_total{job="insights"}[30m]))
+    labels:
+      slo: insights-disponivel
+  - record: slo:sli_erro:taxa1h
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[1h])) / sum(rate(http_requests_total{job="insights"}[1h]))
+    labels:
+      slo: insights-disponivel
+  - record: slo:sli_erro:taxa6h
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[6h])) / sum(rate(http_requests_total{job="insights"}[6h]))
+    labels:
+      slo: insights-disponivel
+- name: slo_sli_erro_lento
+  interval: 2m
+  rules:
+  - record: slo:sli_erro:taxa3d
+    expr: sum(rate(http_requests_total{status=~"5.."}[3d])) / sum(rate(http_requests_total[3d]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa30d
+    expr: sum(rate(http_requests_total{status=~"5.."}[30d])) / sum(rate(http_requests_total[30d]))
+    labels:
+      slo: gateway-disponivel
+  - record: slo:sli_erro:taxa3d
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[3d])) / sum(rate(http_requests_total{job="limits"}[3d]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa30d
+    expr: sum(rate(http_requests_total{job="limits",status=~"5.."}[30d])) / sum(rate(http_requests_total{job="limits"}[30d]))
+    labels:
+      slo: limits-disponivel
+  - record: slo:sli_erro:taxa3d
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[3d])) / sum(rate(http_requests_total{job="insights"}[3d]))
+    labels:
+      slo: insights-disponivel
+  - record: slo:sli_erro:taxa30d
+    expr: sum(rate(http_requests_total{job="insights",status=~"5.."}[30d])) / sum(rate(http_requests_total{job="insights"}[30d]))
+    labels:
+      slo: insights-disponivel
+- name: slo_orcamento
+  interval: 2m
+  rules:
+  - record: slo:orcamento_erro:objetivo
+    expr: '0.005'
+    labels:
+      slo: gateway-disponivel
+  - record: slo:orcamento:consumido
+    expr: slo:sli_erro:taxa30d{slo="gateway-disponivel"} / 0.005
+    labels:
+      slo: gateway-disponivel
+  - record: slo:orcamento_erro:objetivo
+    expr: '0.001'
+    labels:
+      slo: limits-disponivel
+  - record: slo:orcamento:consumido
+    expr: slo:sli_erro:taxa30d{slo="limits-disponivel"} / 0.001
+    labels:
+      slo: limits-disponivel
+  - record: slo:orcamento_erro:objetivo
+    expr: '0.01'
+    labels:
+      slo: insights-disponivel
+  - record: slo:orcamento:consumido
+    expr: slo:sli_erro:taxa30d{slo="insights-disponivel"} / 0.01
+    labels:
+      slo: insights-disponivel
+- name: slo_queima_orcamento
+  rules:
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa1h{slo="gateway-disponivel"} > 0.072 and slo:sli_erro:taxa5m{slo="gateway-disponivel"}
+      > 0.072
+    for: 2m
+    labels:
+      severity: pagina
+      slo: gateway-disponivel
+      janela: queima-rapida
+    annotations:
+      summary: SLO gateway-disponivel queimando orçamento de erro (queima-rapida, 14.4x)
+      description: 'A taxa de erro do SLO gateway-disponivel está acima de 14.4x o orçamento nas janelas
+        de 1h e 5m. Objetivo: 0.9950.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa1h{slo="limits-disponivel"} > 0.0144 and slo:sli_erro:taxa5m{slo="limits-disponivel"}
+      > 0.0144
+    for: 2m
+    labels:
+      severity: pagina
+      slo: limits-disponivel
+      janela: queima-rapida
+    annotations:
+      summary: SLO limits-disponivel queimando orçamento de erro (queima-rapida, 14.4x)
+      description: 'A taxa de erro do SLO limits-disponivel está acima de 14.4x o orçamento nas janelas
+        de 1h e 5m. Objetivo: 0.9990.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa6h{slo="gateway-disponivel"} > 0.03 and slo:sli_erro:taxa30m{slo="gateway-disponivel"}
+      > 0.03
+    for: 2m
+    labels:
+      severity: pagina
+      slo: gateway-disponivel
+      janela: queima-media
+    annotations:
+      summary: SLO gateway-disponivel queimando orçamento de erro (queima-media, 6.0x)
+      description: 'A taxa de erro do SLO gateway-disponivel está acima de 6.0x o orçamento nas janelas
+        de 6h e 30m. Objetivo: 0.9950.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa6h{slo="limits-disponivel"} > 0.006 and slo:sli_erro:taxa30m{slo="limits-disponivel"}
+      > 0.006
+    for: 2m
+    labels:
+      severity: pagina
+      slo: limits-disponivel
+      janela: queima-media
+    annotations:
+      summary: SLO limits-disponivel queimando orçamento de erro (queima-media, 6.0x)
+      description: 'A taxa de erro do SLO limits-disponivel está acima de 6.0x o orçamento nas janelas
+        de 6h e 30m. Objetivo: 0.9990.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa6h{slo="insights-disponivel"} > 0.06 and slo:sli_erro:taxa30m{slo="insights-disponivel"}
+      > 0.06
+    for: 2m
+    labels:
+      severity: pagina
+      slo: insights-disponivel
+      janela: queima-media
+    annotations:
+      summary: SLO insights-disponivel queimando orçamento de erro (queima-media, 6.0x)
+      description: 'A taxa de erro do SLO insights-disponivel está acima de 6.0x o orçamento nas janelas
+        de 6h e 30m. Objetivo: 0.9900.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa3d{slo="gateway-disponivel"} > 0.005 and slo:sli_erro:taxa6h{slo="gateway-disponivel"}
+      > 0.005
+    for: 15m
+    labels:
+      severity: ticket
+      slo: gateway-disponivel
+      janela: queima-lenta
+    annotations:
+      summary: SLO gateway-disponivel queimando orçamento de erro (queima-lenta, 1.0x)
+      description: 'A taxa de erro do SLO gateway-disponivel está acima de 1.0x o orçamento nas janelas
+        de 3d e 6h. Objetivo: 0.9950.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa3d{slo="limits-disponivel"} > 0.001 and slo:sli_erro:taxa6h{slo="limits-disponivel"}
+      > 0.001
+    for: 15m
+    labels:
+      severity: ticket
+      slo: limits-disponivel
+      janela: queima-lenta
+    annotations:
+      summary: SLO limits-disponivel queimando orçamento de erro (queima-lenta, 1.0x)
+      description: 'A taxa de erro do SLO limits-disponivel está acima de 1.0x o orçamento nas janelas
+        de 3d e 6h. Objetivo: 0.9990.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md
+  - alert: SLOQueimaDeOrcamento
+    expr: slo:sli_erro:taxa3d{slo="insights-disponivel"} > 0.01 and slo:sli_erro:taxa6h{slo="insights-disponivel"}
+      > 0.01
+    for: 15m
+    labels:
+      severity: ticket
+      slo: insights-disponivel
+      janela: queima-lenta
+    annotations:
+      summary: SLO insights-disponivel queimando orçamento de erro (queima-lenta, 1.0x)
+      description: 'A taxa de erro do SLO insights-disponivel está acima de 1.0x o orçamento nas janelas
+        de 3d e 6h. Objetivo: 0.9900.'
+      runbook_url: https://github.com/ronaldochiavegatti/fluxofiscal/blob/main/docs/observabilidade/runbooks/error-budget-burn.md

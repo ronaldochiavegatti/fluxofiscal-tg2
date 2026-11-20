@@ -1,0 +1,32 @@
+[
+  {
+    "item": "Se eu faturar mais do que o teto permitido no ano, o que acontece comigo?",
+    "registrado_entrada": 989,
+    "registrado_saida": 397,
+    "api_prompt_token_count": 989,
+    "api_candidates_token_count": 397,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1386,
+    "count_tokens_entrada": 989
+  },
+  {
+    "item": "Aquele boleto que pago todo mês como MEI serve pra quê?",
+    "registrado_entrada": 912,
+    "registrado_saida": 305,
+    "api_prompt_token_count": 912,
+    "api_candidates_token_count": 305,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1217,
+    "count_tokens_entrada": 912
+  },
+  {
+    "item": "Tenho que prestar contas à Receita de quanto ganhei no ano anterior?",
+    "registrado_entrada": 909,
+    "registrado_saida": 325,
+    "api_prompt_token_count": 909,
+    "api_candidates_token_count": 325,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1234,
+    "count_tokens_entrada": 909
+  }
+]

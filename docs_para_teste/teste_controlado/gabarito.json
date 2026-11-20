@@ -1,0 +1,602 @@
+{
+  "notas": [
+    {
+      "arquivo": "01_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-01-14",
+      "valor_total": 3200.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "31.415.926/0001-71",
+      "chave_acesso": "35503081212345678000190000000000000126011279040065",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "02_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-02-20",
+      "valor_total": 4750.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "27.182.818/0001-29",
+      "chave_acesso": "35503081212345678000190000000000000226023430438686",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "03_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-03-11",
+      "valor_total": 5180.5,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "31.415.926/0001-71",
+      "chave_acesso": "35503081212345678000190000000000000326035395721825",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "04_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-04-08",
+      "valor_total": 2940.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "16.180.339/0001-57",
+      "chave_acesso": "35503081212345678000190000000000000426045495654543",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "05_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-05-22",
+      "valor_total": 6300.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "27.182.818/0001-29",
+      "chave_acesso": "35503081212345678000190000000000000526056949237496",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "06_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-06-17",
+      "valor_total": 4125.75,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "14.142.135/0001-04",
+      "chave_acesso": "35503081212345678000190000000000000626069234185960",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "07_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-07-09",
+      "valor_total": 7480.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "31.415.926/0001-71",
+      "chave_acesso": "35503081212345678000190000000000000726071102054731",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "08_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-08-26",
+      "valor_total": 5600.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "16.180.339/0001-57",
+      "chave_acesso": "35503081212345678000190000000000000826089493164022",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "09_compra_nfe.png",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-03-05",
+      "valor_total": 1289.9,
+      "cnpj_emitente": "57.721.566/0001-20",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260357721566000120550010000184521299687454",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "10_compra_nfe.pdf",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-06-02",
+      "valor_total": 349.0,
+      "cnpj_emitente": "69.314.718/0001-59",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260669314718000159550010000033071834141848",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "11_compra_nfse.txt",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-12",
+      "valor_total": 612.4,
+      "cnpj_emitente": "30.102.999/0001-40",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081230102999000140000000000229126094516318647",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "12_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-09-30",
+      "valor_total": 882.0,
+      "cnpj_emitente": "41.421.356/0001-86",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260941421356000186650010000048711768488847",
+      "observacao": "valor total R$ 980,00, desconto R$ 98,00: o valor correto é o VALOR A PAGAR",
+      "conjunto": "artigo"
+    },
+    {
+      "arquivo": "13_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-08-31",
+      "valor_total": 1850.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "17.320.508/0001-70",
+      "chave_acesso": "35503081212345678000190000000000000926087261519104",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "14_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-03",
+      "valor_total": 2400.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "26.457.513/0001-10",
+      "chave_acesso": "35503081212345678000190000000000001026095298381514",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "15_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-08",
+      "valor_total": 980.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "28.284.271/0001-35",
+      "chave_acesso": "35503081212345678000190000000000001126095717738576",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "16_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-11",
+      "valor_total": 3650.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "22.360.679/0001-62",
+      "chave_acesso": "35503081212345678000190000000000001226096141436020",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "17_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-16",
+      "valor_total": 1200.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "36.055.512/0001-00",
+      "chave_acesso": "35503081212345678000190000000000001326090723447940",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "18_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-21",
+      "valor_total": 2275.5,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "33.166.247/0001-31",
+      "chave_acesso": "35503081212345678000190000000000001426090908347911",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "19_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-24",
+      "valor_total": 4890.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "38.729.833/0001-60",
+      "chave_acesso": "35503081212345678000190000000000001526097979616274",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "20_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-09-29",
+      "valor_total": 1575.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "42.426.406/0001-80",
+      "chave_acesso": "35503081212345678000190000000000001626098885594864",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "21_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-02",
+      "valor_total": 850.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "17.320.508/0001-70",
+      "chave_acesso": "35503081212345678000190000000000001726108311496929",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "22_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-07",
+      "valor_total": 3120.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "26.457.513/0001-10",
+      "chave_acesso": "35503081212345678000190000000000001826100390266300",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "23_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-13",
+      "valor_total": 1990.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "28.284.271/0001-35",
+      "chave_acesso": "35503081212345678000190000000000001926106184444039",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "24_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-16",
+      "valor_total": 2780.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "22.360.679/0001-62",
+      "chave_acesso": "35503081212345678000190000000000002026105648409661",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "25_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-21",
+      "valor_total": 1340.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "36.055.512/0001-00",
+      "chave_acesso": "35503081212345678000190000000000002126103869298541",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "26_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-26",
+      "valor_total": 2050.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "33.166.247/0001-31",
+      "chave_acesso": "35503081212345678000190000000000002226106841624884",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "27_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-29",
+      "valor_total": 1680.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "38.729.833/0001-60",
+      "chave_acesso": "35503081212345678000190000000000002326103703134716",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "28_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-11-03",
+      "valor_total": 3460.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "42.426.406/0001-80",
+      "chave_acesso": "35503081212345678000190000000000002426114305281777",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "29_venda_nfse.png",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-11-05",
+      "valor_total": 760.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "17.320.508/0001-70",
+      "chave_acesso": "35503081212345678000190000000000002526110148349460",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "30_venda_nfse.jpg",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-11-09",
+      "valor_total": 2215.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "26.457.513/0001-10",
+      "chave_acesso": "35503081212345678000190000000000002626119000315005",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "31_venda_nfse.pdf",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-11-11",
+      "valor_total": 1430.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "36.055.512/0001-00",
+      "chave_acesso": "35503081212345678000190000000000002726117741981581",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "32_venda_nfse.txt",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-11-13",
+      "valor_total": 2960.0,
+      "cnpj_emitente": "12.345.678/0001-90",
+      "cnpj_destinatario": "28.284.271/0001-35",
+      "chave_acesso": "35503081212345678000190000000000002826115568034951",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "33_compra_nfe.pdf",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-01-19",
+      "valor_total": 3899.0,
+      "cnpj_emitente": "45.175.395/0001-00",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260145175395000100550010000228711742086074",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "34_compra_nfe.png",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-02-10",
+      "valor_total": 439.7,
+      "cnpj_emitente": "57.735.026/0001-03",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260257735026000103550010000034121643736507",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "35_compra_nfe.jpg",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-03-17",
+      "valor_total": 1557.8,
+      "cnpj_emitente": "57.721.566/0001-20",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260357721566000120550010000189771767237823",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "36_compra_nfe.pdf",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-04-06",
+      "valor_total": 689.0,
+      "cnpj_emitente": "64.575.131/0001-80",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260464575131000180550010000011881847106537",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "37_compra_nfe.jpg",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-05-04",
+      "valor_total": 797.0,
+      "cnpj_emitente": "45.175.395/0001-00",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260545175395000100550010000229901729801615",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "38_compra_nfe.png",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-06-15",
+      "valor_total": 1890.0,
+      "cnpj_emitente": "69.314.718/0001-59",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260669314718000159550010000033551536014985",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "39_compra_nfe.pdf",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-07-21",
+      "valor_total": 768.0,
+      "cnpj_emitente": "57.721.566/0001-20",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260757721566000120550010000193401566121778",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "40_compra_nfe.png",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-08-19",
+      "valor_total": 236.5,
+      "cnpj_emitente": "57.735.026/0001-03",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260857735026000103550010000036111747155212",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "41_compra_nfe.png",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "data": "2026-10-13",
+      "valor_total": 918.0,
+      "cnpj_emitente": "45.175.395/0001-00",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35261045175395000100550010000233151249244307",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "42_compra_nfse.pdf",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-01-31",
+      "valor_total": 149.9,
+      "cnpj_emitente": "47.720.958/0001-10",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081247720958000110000000000552126015403850228",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "43_compra_nfse.txt",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-03-31",
+      "valor_total": 89.0,
+      "cnpj_emitente": "50.663.151/0001-06",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081250663151000106000000000088726034674164590",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "44_compra_nfse.png",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-05-20",
+      "valor_total": 180.0,
+      "cnpj_emitente": "52.705.749/0001-38",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081252705749000138000000000145226057691422323",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "45_compra_nfse.jpg",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-07-08",
+      "valor_total": 497.0,
+      "cnpj_emitente": "55.319.832/0001-67",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081255319832000167000000000031026072433119064",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "46_compra_nfse.pdf",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "data": "2026-10-12",
+      "valor_total": 612.4,
+      "cnpj_emitente": "30.102.999/0001-40",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35503081230102999000140000000000240826101798470361",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "47_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-02-26",
+      "valor_total": 78.69,
+      "cnpj_emitente": "61.803.398/0001-99",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260261803398000199650010000102331164277888",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "48_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-04-18",
+      "valor_total": 330.0,
+      "cnpj_emitente": "66.820.148/0001-80",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260466820148000180650010000055901519285666",
+      "observacao": "valor total R$ 355,00, desconto R$ 25,00: o valor correto é o VALOR A PAGAR",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "49_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-06-09",
+      "valor_total": 152.3,
+      "cnpj_emitente": "64.575.131/0001-80",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260664575131000180650010000774121772063918",
+      "observacao": "valor total R$ 162,30, desconto R$ 10,00: o valor correto é o VALOR A PAGAR",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "50_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-08-05",
+      "valor_total": 116.1,
+      "cnpj_emitente": "57.735.026/0001-03",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260857735026000103650010000061141070388706",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "51_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-09-17",
+      "valor_total": 51.27,
+      "cnpj_emitente": "61.803.398/0001-99",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35260961803398000199650010000109871009727870",
+      "conjunto": "extra"
+    },
+    {
+      "arquivo": "52_compra_nfce_foto.jpg",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "data": "2026-11-10",
+      "valor_total": 213.0,
+      "cnpj_emitente": "66.820.148/0001-80",
+      "cnpj_destinatario": "12.345.678/0001-90",
+      "chave_acesso": "35261166820148000180650010000064021393968083",
+      "observacao": "valor total R$ 228,00, desconto R$ 15,00: o valor correto é o VALOR A PAGAR",
+      "conjunto": "extra"
+    }
+  ],
+  "perguntas_rag": [
+    {
+      "pergunta": "Se eu faturar mais do que o teto permitido no ano, o que acontece comigo?",
+      "trecho_esperado": "Consequências de ultrapassar o limite anual"
+    },
+    {
+      "pergunta": "Aquele boleto que pago todo mês como MEI serve pra quê?",
+      "trecho_esperado": "DAS: guia mensal do MEI"
+    },
+    {
+      "pergunta": "Tenho que prestar contas à Receita de quanto ganhei no ano anterior?",
+      "trecho_esperado": "DASN-SIMEI: declaração anual obrigatória"
+    },
+    {
+      "pergunta": "O dinheiro que gasto comprando material entra na conta do teto de faturamento?",
+      "trecho_esperado": "Apenas vendas contam para o limite anual do MEI"
+    },
+    {
+      "pergunta": "Posso sair do MEI por vontade própria para virar microempresa?",
+      "trecho_esperado": "Pedido de desenquadramento voluntário"
+    }
+  ]
+}

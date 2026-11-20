@@ -1,0 +1,1377 @@
+{
+  "meta": {
+    "quando": "2026-11-18_2349",
+    "base": "http://localhost:8000",
+    "email": "avaliacao.tg+20261118234905@fluxofiscal.tech",
+    "conjunto": "todas"
+  },
+  "extracao": [
+    {
+      "arquivo": "01_venda_nfse.png",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 3200.0,
+        "data": "2026-01-14",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 3200.0,
+        "data": "2026-01-14",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 15.14
+    },
+    {
+      "arquivo": "02_venda_nfse.jpg",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 4750.0,
+        "data": "2026-02-20",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 4750.0,
+        "data": "2026-02-20",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 12.7
+    },
+    {
+      "arquivo": "03_venda_nfse.pdf",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 5180.5,
+        "data": "2026-03-11",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 5180.5,
+        "data": "2026-03-11",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 8.67
+    },
+    {
+      "arquivo": "04_venda_nfse.txt",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2940.0,
+        "data": "2026-04-08",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2940.0,
+        "data": "2026-04-08",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.04
+    },
+    {
+      "arquivo": "05_venda_nfse.png",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 6300.0,
+        "data": "2026-05-22",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 6300.0,
+        "data": "2026-05-22",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 16.81
+    },
+    {
+      "arquivo": "06_venda_nfse.pdf",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 4125.75,
+        "data": "2026-06-17",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 4125.75,
+        "data": "2026-06-17",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 5.86
+    },
+    {
+      "arquivo": "07_venda_nfse.jpg",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 7480.0,
+        "data": "2026-07-09",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 7480.0,
+        "data": "2026-07-09",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.84
+    },
+    {
+      "arquivo": "08_venda_nfse.txt",
+      "conjunto": "artigo",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 5600.0,
+        "data": "2026-08-26",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 5600.0,
+        "data": "2026-08-26",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 0.99
+    },
+    {
+      "arquivo": "09_compra_nfe.png",
+      "conjunto": "artigo",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 1289.9,
+        "data": "2026-03-05",
+        "cnpj": "57721566000120"
+      },
+      "obtido": {
+        "valor": 1289.9,
+        "data": "2026-03-05",
+        "cnpj": "57721566000120"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 8.65
+    },
+    {
+      "arquivo": "10_compra_nfe.pdf",
+      "conjunto": "artigo",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 349.0,
+        "data": "2026-06-02",
+        "cnpj": "69314718000159"
+      },
+      "obtido": {
+        "valor": 349.0,
+        "data": "2026-06-02",
+        "cnpj": "69314718000159"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.13
+    },
+    {
+      "arquivo": "11_compra_nfse.txt",
+      "conjunto": "artigo",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 612.4,
+        "data": "2026-09-12",
+        "cnpj": "30102999000140"
+      },
+      "obtido": {
+        "valor": 612.4,
+        "data": "2026-09-12",
+        "cnpj": "30102999000140"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.07
+    },
+    {
+      "arquivo": "12_compra_nfce_foto.jpg",
+      "conjunto": "artigo",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 882.0,
+        "data": "2026-09-30",
+        "cnpj": "41421356000186"
+      },
+      "obtido": {
+        "valor": 882.0,
+        "data": "2026-09-30",
+        "cnpj": "41421356000186"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.25
+    },
+    {
+      "arquivo": "13_venda_nfse.png",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1850.0,
+        "data": "2026-08-31",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1850.0,
+        "data": "2026-08-31",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 14.36
+    },
+    {
+      "arquivo": "14_venda_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2400.0,
+        "data": "2026-09-03",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2400.0,
+        "data": "2026-09-03",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.81
+    },
+    {
+      "arquivo": "15_venda_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 980.0,
+        "data": "2026-09-08",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 980.0,
+        "data": "2026-09-08",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.4
+    },
+    {
+      "arquivo": "16_venda_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 3650.0,
+        "data": "2026-09-11",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 3650.0,
+        "data": "2026-09-11",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 0.87
+    },
+    {
+      "arquivo": "17_venda_nfse.png",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1200.0,
+        "data": "2026-09-16",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1200.0,
+        "data": "2026-09-16",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.59
+    },
+    {
+      "arquivo": "18_venda_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2275.5,
+        "data": "2026-09-21",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2275.5,
+        "data": "2026-09-21",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.73
+    },
+    {
+      "arquivo": "19_venda_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 4890.0,
+        "data": "2026-09-24",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 4890.0,
+        "data": "2026-09-24",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.6
+    },
+    {
+      "arquivo": "20_venda_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1575.0,
+        "data": "2026-09-29",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1575.0,
+        "data": "2026-09-29",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 0.85
+    },
+    {
+      "arquivo": "21_venda_nfse.png",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 850.0,
+        "data": "2026-10-02",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 850.0,
+        "data": "2026-10-02",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 12.38
+    },
+    {
+      "arquivo": "22_venda_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 3120.0,
+        "data": "2026-10-07",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 3120.0,
+        "data": "2026-10-07",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.29
+    },
+    {
+      "arquivo": "23_venda_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1990.0,
+        "data": "2026-10-13",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1990.0,
+        "data": "2026-10-13",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 6.6
+    },
+    {
+      "arquivo": "24_venda_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2780.0,
+        "data": "2026-10-16",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2780.0,
+        "data": "2026-10-16",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 0.89
+    },
+    {
+      "arquivo": "25_venda_nfse.png",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1340.0,
+        "data": "2026-10-21",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1340.0,
+        "data": "2026-10-21",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 16.55
+    },
+    {
+      "arquivo": "26_venda_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2050.0,
+        "data": "2026-10-26",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2050.0,
+        "data": "2026-10-26",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.84
+    },
+    {
+      "arquivo": "27_venda_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1680.0,
+        "data": "2026-10-29",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1680.0,
+        "data": "2026-10-29",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.24
+    },
+    {
+      "arquivo": "28_venda_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 3460.0,
+        "data": "2026-11-03",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 3460.0,
+        "data": "2026-11-03",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.09
+    },
+    {
+      "arquivo": "29_venda_nfse.png",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 760.0,
+        "data": "2026-11-05",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 760.0,
+        "data": "2026-11-05",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 11.6
+    },
+    {
+      "arquivo": "30_venda_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2215.0,
+        "data": "2026-11-09",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2215.0,
+        "data": "2026-11-09",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 18.39
+    },
+    {
+      "arquivo": "31_venda_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 1430.0,
+        "data": "2026-11-11",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 1430.0,
+        "data": "2026-11-11",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 6.22
+    },
+    {
+      "arquivo": "32_venda_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "venda",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 2960.0,
+        "data": "2026-11-13",
+        "cnpj": "12345678000190"
+      },
+      "obtido": {
+        "valor": 2960.0,
+        "data": "2026-11-13",
+        "cnpj": "12345678000190"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 0.93
+    },
+    {
+      "arquivo": "33_compra_nfe.pdf",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 3899.0,
+        "data": "2026-01-19",
+        "cnpj": "45175395000100"
+      },
+      "obtido": {
+        "valor": 3899.0,
+        "data": "2026-01-19",
+        "cnpj": "45175395000100"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.88
+    },
+    {
+      "arquivo": "34_compra_nfe.png",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 439.7,
+        "data": "2026-02-10",
+        "cnpj": "57735026000103"
+      },
+      "obtido": {
+        "valor": 439.7,
+        "data": "2026-02-10",
+        "cnpj": "57735026000103"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 9.09
+    },
+    {
+      "arquivo": "35_compra_nfe.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 1557.8,
+        "data": "2026-03-17",
+        "cnpj": "57721566000120"
+      },
+      "obtido": {
+        "valor": 1557.8,
+        "data": "2026-03-17",
+        "cnpj": "57721566000120"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 9.28
+    },
+    {
+      "arquivo": "36_compra_nfe.pdf",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 689.0,
+        "data": "2026-04-06",
+        "cnpj": "64575131000180"
+      },
+      "obtido": {
+        "valor": 689.0,
+        "data": "2026-04-06",
+        "cnpj": "64575131000180"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 8.31
+    },
+    {
+      "arquivo": "37_compra_nfe.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 797.0,
+        "data": "2026-05-04",
+        "cnpj": "45175395000100"
+      },
+      "obtido": {
+        "valor": 797.0,
+        "data": "2026-05-04",
+        "cnpj": "45175395000100"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.89
+    },
+    {
+      "arquivo": "38_compra_nfe.png",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 1890.0,
+        "data": "2026-06-15",
+        "cnpj": "69314718000159"
+      },
+      "obtido": {
+        "valor": 1890.0,
+        "data": "2026-06-15",
+        "cnpj": "69314718000159"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 9.54
+    },
+    {
+      "arquivo": "39_compra_nfe.pdf",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 768.0,
+        "data": "2026-07-21",
+        "cnpj": "57721566000120"
+      },
+      "obtido": {
+        "valor": 768.0,
+        "data": "2026-07-21",
+        "cnpj": "57721566000120"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 7.2
+    },
+    {
+      "arquivo": "40_compra_nfe.png",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 236.5,
+        "data": "2026-08-19",
+        "cnpj": "57735026000103"
+      },
+      "obtido": {
+        "valor": 236.5,
+        "data": "2026-08-19",
+        "cnpj": "57735026000103"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 12.65
+    },
+    {
+      "arquivo": "41_compra_nfe.png",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NF-e modelo 55 (DANFE)",
+      "erro": null,
+      "esperado": {
+        "valor": 918.0,
+        "data": "2026-10-13",
+        "cnpj": "45175395000100"
+      },
+      "obtido": {
+        "valor": 918.0,
+        "data": "2026-10-13",
+        "cnpj": "45175395000100"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 13.79
+    },
+    {
+      "arquivo": "42_compra_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 149.9,
+        "data": "2026-01-31",
+        "cnpj": "47720958000110"
+      },
+      "obtido": {
+        "valor": 149.9,
+        "data": "2026-01-31",
+        "cnpj": "47720958000110"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 11.88
+    },
+    {
+      "arquivo": "43_compra_nfse.txt",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 89.0,
+        "data": "2026-03-31",
+        "cnpj": "50663151000106"
+      },
+      "obtido": {
+        "valor": 89.0,
+        "data": "2026-03-31",
+        "cnpj": "50663151000106"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.16
+    },
+    {
+      "arquivo": "44_compra_nfse.png",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 180.0,
+        "data": "2026-05-20",
+        "cnpj": "52705749000138"
+      },
+      "obtido": {
+        "valor": 180.0,
+        "data": "2026-05-20",
+        "cnpj": "52705749000138"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 11.35
+    },
+    {
+      "arquivo": "45_compra_nfse.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 497.0,
+        "data": "2026-07-08",
+        "cnpj": "55319832000167"
+      },
+      "obtido": {
+        "valor": 497.0,
+        "data": "2026-07-08",
+        "cnpj": "55319832000167"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 10.44
+    },
+    {
+      "arquivo": "46_compra_nfse.pdf",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFS-e Nacional (DANFSe)",
+      "erro": null,
+      "esperado": {
+        "valor": 612.4,
+        "data": "2026-10-12",
+        "cnpj": "30102999000140"
+      },
+      "obtido": {
+        "valor": 612.4,
+        "data": "2026-10-12",
+        "cnpj": "30102999000140"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 12.59
+    },
+    {
+      "arquivo": "47_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 78.69,
+        "data": "2026-02-26",
+        "cnpj": "61803398000199"
+      },
+      "obtido": {
+        "valor": 78.69,
+        "data": "2026-02-26",
+        "cnpj": "61803398000199"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.86
+    },
+    {
+      "arquivo": "48_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 330.0,
+        "data": "2026-04-18",
+        "cnpj": "66820148000180"
+      },
+      "obtido": {
+        "valor": 330.0,
+        "data": "2026-04-18",
+        "cnpj": "66820148000180"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 3.85
+    },
+    {
+      "arquivo": "49_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 152.3,
+        "data": "2026-06-09",
+        "cnpj": "64575131000180"
+      },
+      "obtido": {
+        "valor": 152.3,
+        "data": "2026-06-09",
+        "cnpj": "64575131000180"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 2.99
+    },
+    {
+      "arquivo": "50_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 116.1,
+        "data": "2026-08-05",
+        "cnpj": "57735026000103"
+      },
+      "obtido": {
+        "valor": 116.1,
+        "data": "2026-08-05",
+        "cnpj": "57735026000103"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 4.56
+    },
+    {
+      "arquivo": "51_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 51.27,
+        "data": "2026-09-17",
+        "cnpj": "61803398000199"
+      },
+      "obtido": {
+        "valor": 51.27,
+        "data": "2026-09-17",
+        "cnpj": "61803398000199"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 1.71
+    },
+    {
+      "arquivo": "52_compra_nfce_foto.jpg",
+      "conjunto": "extra",
+      "tipo": "compra",
+      "documento": "NFC-e modelo 65 (DANFE NFC-e), foto",
+      "erro": null,
+      "esperado": {
+        "valor": 213.0,
+        "data": "2026-11-10",
+        "cnpj": "66820148000180"
+      },
+      "obtido": {
+        "valor": 213.0,
+        "data": "2026-11-10",
+        "cnpj": "66820148000180"
+      },
+      "acerto": {
+        "valor": true,
+        "data": true,
+        "cnpj": true
+      },
+      "metodo": "gemini",
+      "duplicado": false,
+      "tempo_s": 5.36
+    }
+  ],
+  "rag": [
+    {
+      "n": 1,
+      "pergunta": "Se eu faturar mais do que o teto permitido no ano, o que acontece comigo?",
+      "trecho_esperado": "Consequências de ultrapassar o limite anual",
+      "fontes": [
+        "Consequências de ultrapassar o limite anual (Receita Federal / CGSN)",
+        "Limite anual de faturamento do MEI (Receita Federal / Portal do Empreendedor)",
+        "Fiscalização cruzada de dados (Receita Federal (dados de fiscalização, 2024))"
+      ],
+      "posicao": 1,
+      "tempo_s": 3.5,
+      "resposta": "Olá! Como seu assistente fiscal especializado em MEI, estou aqui para ajudar. \n\nRespondendo à sua dúvida sobre o que acontece caso você ultrapasse o teto de faturamento permitido, as regras dependem do valor que você exceder o limite anual do MEI (que em 2026 é de **R$ 81.000,00**):\n\n1. **Excesso de até 20% (faturamento total de até R$ 97.200,00):**\n   * Você deverá pagar um DAS complementar referente apenas ao valor que passou do limite.\n   * O seu desenquadramento da categoria de MEI para Microempresa (ME) acontecerá a partir de janeiro do ano seguinte.\n   * *Base legal:* Conforme a regra da Receita Federal / CGSN.\n\n2. **Excesso de mais de 20% (faturamento total acima de R$ 97.200,00):**\n   * O desenquadramento para Microempresa (ME) ocorre de forma **retroativa a 1º de janeiro** do ano em que o limite foi excedido.\n   * Será cobrada a diferença de impostos, além de multa e juros calculados como Microempresa sobre todo o período retroativo do ano.\n   * *Base legal:* LC 123/2006, art. 18-A; Resolução CGSN nº 140/2018, art. 115.\n\n**Orientações práticas e objetivas:**\n* **Monitore suas vendas:** Acompanhe de perto o seu faturamento acumulado ao longo do ano para não ser pego de surpresa. Vale lembrar que o limite de R$ 81.000,00 diz respeito **estritamente às suas vendas**, sem somar as despesas (compras).\n* **Fique atento à fiscalização:** A Receita Federal realiza cruzamentos automáticos de dados por meio de notas fiscais, maquininhas de cartão, e-Financeira e marketplaces. (Para você ter uma ideia, apenas em 2024, mais de 570 mil MEIs foram desenquadrados por excesso de faturamento por meio dessa fiscalização cruzada).\n\nAtualmente, os seus dados financeiros para o ano de 2026 registram um faturamento acumulado de **R$ 0,00**, faltando ainda **R$ 81.000,00** para atingir o limite anual. \n\nSe precisar de ajuda para acompanhar esses números ou tiver qualquer outra dúvida, estou à disposição!"
+    },
+    {
+      "n": 2,
+      "pergunta": "Aquele boleto que pago todo mês como MEI serve pra quê?",
+      "trecho_esperado": "DAS: guia mensal do MEI",
+      "fontes": [
+        "DAS: guia mensal do MEI (Receita Federal / Simples Nacional)",
+        "DASN-SIMEI: declaração anual obrigatória (Receita Federal / Simples Nacional)",
+        "Apenas vendas contam para o limite anual do MEI (Receita Federal / Simples Nacional)"
+      ],
+      "posicao": 1,
+      "tempo_s": 2.36,
+      "resposta": "Olá! Como assistente fiscal especializado em MEI, estou aqui para ajudar você com suas dúvidas.\n\nRespondendo à sua pergunta, o boleto que você paga todo mês como MEI é chamado de **DAS (Documento de Arrecadação do Simples Nacional)**. \n\nConforme a base de conhecimento oficial da *(Receita Federal / Simples Nacional) DAS: guia mensal do MEI*, o DAS é a guia mensal de impostos do MEI, com vencimento todo dia 20. Ele reúne a contribuição do INSS e, dependendo da atividade exercida, o ICMS (comércio e indústria) ou o ISS (serviços) em valor fixo mensal.\n\n### Orientações práticas e objetivas:\n1. **Mantenha o pagamento em dia:** Pagar o DAS até o dia 20 de cada mês garante que você continue com seus direitos previdenciários ativos (como aposentadoria, auxílio-doença e salário-maternidade) e mantém sua empresa regularizada.\n2. **Controle financeiro:** Aproveite para lembrar que os pagamentos e custos do negócio devem ser acompanhados de perto. Atualmente, para o ano de **2026**, suas despesas acumuladas estão em **R$ 0,00** e o faturamento com vendas está em **R$ 0,00**.\n\nSe precisar de mais alguma orientação sobre obrigações ou sobre o seu MEI, é só chamar!"
+    },
+    {
+      "n": 3,
+      "pergunta": "Tenho que prestar contas à Receita de quanto ganhei no ano anterior?",
+      "trecho_esperado": "DASN-SIMEI: declaração anual obrigatória",
+      "fontes": [
+        "Rendimentos recebidos no CPF contam para o limite (Resolução CGSN nº 183/2025)",
+        "DASN-SIMEI: declaração anual obrigatória (Receita Federal / Simples Nacional)",
+        "Apenas vendas contam para o limite anual do MEI (Receita Federal / Simples Nacional)"
+      ],
+      "posicao": 2,
+      "tempo_s": 2.07,
+      "resposta": "Olá! Sou o seu assistente fiscal especializado em MEI. \n\nRespondendo à sua pergunta: **Sim, você tem a obrigação de prestar contas à Receita Federal sobre o ano anterior**, mesmo que a sua empresa não tenha tido faturamento.\n\nConforme a regra da Receita Federal e do Simples Nacional sobre a **DASN-SIMEI: declaração anual obrigatória**, todo MEI deve entregar essa declaração anual até o dia **31 de maio de cada ano**, informando o faturamento do ano anterior. A regra destaca que essa entrega é obrigatória **mesmo que não tenha faturado nada** (como é o caso do seu faturamento acumulado no ano, que está em R$ 0,00).\n\nFique atento ao prazo para evitar penalidades, pois a entrega em atraso gera multa de 2% ao mês sobre os tributos declarados, limitada a 20%, com valor mínimo de R$ 50,00.\n\nSe precisar de ajuda com o passo a passo para emitir a sua declaração, estou à disposição!"
+    },
+    {
+      "n": 4,
+      "pergunta": "O dinheiro que gasto comprando material entra na conta do teto de faturamento?",
+      "trecho_esperado": "Apenas vendas contam para o limite anual do MEI",
+      "fontes": [
+        "Apenas vendas contam para o limite anual do MEI (Receita Federal / Simples Nacional)",
+        "Rendimentos recebidos no CPF contam para o limite (Resolução CGSN nº 183/2025)",
+        "Limite anual de faturamento do MEI (Receita Federal / Portal do Empreendedor)"
+      ],
+      "posicao": 1,
+      "tempo_s": 2.11,
+      "resposta": "Olá! Sou seu assistente fiscal especializado em MEI. Respondendo à sua dúvida com base nas normas da Receita Federal:\n\n**Não, o dinheiro que você gasta comprando material não entra na conta do teto de faturamento.**\n\nConforme a base de conhecimento oficial *(Receita Federal / Simples Nacional - Apenas vendas contam para o limite anual do MEI)*:\n> \"O limite anual de R$ 81.000,00 do MEI é calculado apenas sobre o faturamento com vendas de produtos ou prestação de serviços (notas fiscais emitidas pelo próprio MEI). Compras feitas pelo MEI, como aquisição de mercadorias, insumos ou material de uso, são despesas do negócio e não contam para esse limite, embora devam ser registradas para o controle financeiro e o cálculo do lucro.\"\n\n### Situação financeira atual (2026):\n* **Faturamento acumulado no ano (vendas):** R$ 0,00\n* **Despesas acumuladas no ano (compras de materiais):** R$ 0,00\n* **Limite anual do MEI:** R$ 81.000,00\n* **Valor que ainda falta para atingir o limite:** R$ 81.000,00\n\n### Orientações práticas:\n1. **Continue guardando os comprovantes:** Embora as compras não aumentem seu faturamento nem afetem o teto do MEI, é fundamental registrar todas as despesas (como a compra de materiais) para o seu controle financeiro e apuração do lucro.\n2. **Foque apenas nas vendas:** Para o cálculo do limite de R$ 81.000,00, leve em consideração apenas o dinheiro que entra no caixa referente às suas vendas ou serviços prestados (além de eventuais rendimentos no CPF, conforme as regras atuais). No momento, seu faturamento acumulado é de R$ 0,00.\n\nSe precisar de mais alguma orientação sobre o seu MEI, estou à disposição!"
+    },
+    {
+      "n": 5,
+      "pergunta": "Posso sair do MEI por vontade própria para virar microempresa?",
+      "trecho_esperado": "Pedido de desenquadramento voluntário",
+      "fontes": [
+        "Consequências de ultrapassar o limite anual (Receita Federal / CGSN)",
+        "Outras causas de perda do enquadramento como MEI (Portal do Empreendedor)",
+        "Pedido de desenquadramento voluntário (Portal do Simples Nacional)"
+      ],
+      "posicao": 3,
+      "tempo_s": 1.87,
+      "resposta": "Olá! Aqui é o seu assistente fiscal especializado em MEI. \n\nRespondendo à sua pergunta: **Sim, você pode sair do MEI por vontade própria para virar Microempresa (ME).**\n\nDe acordo com a base de conhecimento do **Portal do Simples Nacional**, o próprio MEI pode solicitar o desenquadramento voluntário diretamente pelo Portal do Simples Nacional, sem a obrigatoriedade de contratar um contador, sendo permitidos até três pedidos.\n\nPara contextualizar a sua situação financeira atual em **2026**:\n- O seu faturamento acumulado no ano (vendas) está em **R$ 0,00**.\n- O seu limite anual do MEI é de **R$ 81.000,00**.\n- O valor que ainda falta para atingir o limite é de **R$ 81.000,00**, e você **não** ultrapassou o limite anual.\n\nPortanto, caso decida fazer a transição por livre vontade (por exemplo, porque sua empresa cresceu ou porque você deseja emitir notas acima do teto), o procedimento pode ser feito online de forma simples diretamente no portal oficial do governo.\n\nSe precisar de orientações sobre como acessar o portal ou sobre os próximos passos, estou à disposição!"
+    }
+  ]
+}

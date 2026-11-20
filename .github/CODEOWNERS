@@ -1,0 +1,8 @@
+# Todo o repositório é de responsabilidade do autor do TG.
+# Quando o orientador ou outros colaboradores entrarem, adicione-os por caminho.
+*                       @ronaldochiavegatti
+
+# Áreas sensíveis exigem revisão explícita
+/.github/               @ronaldochiavegatti
+/infra/                 @ronaldochiavegatti
+/docs/adr/              @ronaldochiavegatti

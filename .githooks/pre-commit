@@ -1,0 +1,64 @@
+#!/bin/sh
+# Varredura de segredos no que está sendo commitado (gitleaks).
+#
+# Substitui localmente o portão "Histórico e segredos" da CI, que parou de
+# rodar com o GitHub Actions desativado (ADR-0020). Varre só os arquivos
+# staged, no conteúdo que vai para o commit (não o da cópia de trabalho).
+#
+# Usa o binário `gitleaks`, se estiver no PATH; senão, a imagem Docker
+# fixada abaixo. Sem nenhum dos dois, avisa e deixa passar: o hook é uma
+# rede de segurança contra o engano honesto, não um controle de acesso
+# (pode ser pulado com --no-verify). Para exigir a varredura, defina
+# GITLEAKS_OBRIGATORIO=1.
+#
+# Falso positivo: acrescente uma regra de allowlist em .gitleaks.toml, ou
+# um comentário `gitleaks:allow` na linha.
+#
+# Ativado por: git config core.hooksPath .githooks
+
+IMAGEM="zricethezav/gitleaks:v8.18.4"
+RAIZ="$(git rev-parse --show-toplevel)"
+
+arquivos="$(git diff --cached --name-only --diff-filter=ACMR)"
+[ -z "$arquivos" ] && exit 0
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT INT TERM
+
+# Exporta o conteúdo staged (o que vai para o commit) para a pasta temporária.
+git diff --cached --name-only --diff-filter=ACMR -z |
+    xargs -0 git checkout-index --prefix="$tmp/alvo/" --
+cp "$RAIZ/.gitleaks.toml" "$tmp/gitleaks.toml" 2>/dev/null || : > "$tmp/gitleaks.toml"
+
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks detect --no-git --redact --no-banner \
+        --source "$tmp/alvo" --config "$tmp/gitleaks.toml"
+    status=$?
+elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    montagem="$tmp"
+    command -v cygpath >/dev/null 2>&1 && montagem="$(cygpath -w "$tmp")"
+    MSYS_NO_PATHCONV=1 docker run --rm -v "$montagem:/scan" "$IMAGEM" \
+        detect --no-git --redact --no-banner \
+        --source /scan/alvo --config /scan/gitleaks.toml
+    status=$?
+else
+    echo "pre-commit: gitleaks não encontrado (nem binário, nem Docker em execução)." >&2
+    echo "            Instale em https://github.com/gitleaks/gitleaks/releases" >&2
+    if [ "$GITLEAKS_OBRIGATORIO" = "1" ]; then
+        echo "            Commit bloqueado por GITLEAKS_OBRIGATORIO=1." >&2
+        exit 1
+    fi
+    echo "            Commit liberado SEM varredura de segredos." >&2
+    exit 0
+fi
+
+if [ "$status" -ne 0 ]; then
+    echo "" >&2
+    echo "  Possível segredo nos arquivos staged (detalhes acima, valores ocultos)." >&2
+    echo "  Tire o valor do arquivo e use o .env (que não é versionado)." >&2
+    echo "  Se for falso positivo, ajuste o .gitleaks.toml ou marque a linha com" >&2
+    echo "  um comentário gitleaks:allow." >&2
+    echo "" >&2
+    exit 1
+fi
+exit 0

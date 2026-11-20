@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>FluxoFiscal · Assistente fiscal do MEI</title>
+    <script>
+      // Visual novo (flag `visual-novo`) aplicado ANTES da primeira pintura,
+      // com o último valor da flag guardado neste navegador. Sem isto, cada
+      // recarga mostrava o visual antigo até o React montar. O React confirma
+      // ou desfaz isto quando o Unleash responde (src/aparencia/AparenciaContext.tsx).
+      (function () {
+        try {
+          if (localStorage.getItem("visual-novo-ultimo") !== "true") return;
+          var raiz = document.documentElement;
+          raiz.setAttribute("data-visual", "novo");
+          var preferencia = JSON.parse(localStorage.getItem("tema") || '"sistema"');
+          var escuro =
+            preferencia === "escuro" ||
+            (preferencia === "sistema" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          raiz.setAttribute("data-tema", escuro ? "escuro" : "claro");
+          var fonte = document.createElement("link");
+          fonte.id = "fonte-visual-novo";
+          fonte.rel = "stylesheet";
+          fonte.href = "https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap";
+          document.head.appendChild(fonte);
+        } catch (e) {
+          // Sem armazenamento: o React aplica o visual quando montar.
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

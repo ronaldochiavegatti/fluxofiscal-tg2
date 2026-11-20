@@ -1,0 +1,91 @@
+DANFSe v1.0 - Documento Auxiliar da NFS-e
+NFS-e Nacional - Prefeitura do Município de São Paulo
+EMITIDA EM AMBIENTE DE PRODUÇÃO RESTRITA - SEM VALOR FISCAL
+
+Chave de Acesso da NFS-e: 35503081212345678000190000000000002426114305281777
+
+Número da NFS-e: 24
+Competência da NFS-e: 03/11/2026
+Data e Hora da emissão da NFS-e: 03/11/2026 09:48:12
+Número da DPS: 24
+Série da DPS: 900
+Data e Hora da emissão da DPS: 03/11/2026 09:48:12
+
+EMITENTE DA NFS-e  -  Prestador do Serviço
+------------------------------------------
+CNPJ / CPF / NIF: 12.345.678/0001-90
+Inscrição Municipal: 1.234.567-8
+Telefone: (11) 3456-7890
+Nome / Nome Empresarial: Ronaldo Chiavegatti Serviços de TI MEI
+E-mail: contato@rcti.com.br
+Endereço: Rua das Palmeiras, 120 - Sala 4, Vila Mariana
+Município: São Paulo - SP
+CEP: 04101-000
+Simples Nacional na Data de Competência: Optante - Microempreendedor Individual (MEI)
+Regime de Apuração Tributária pelo SN: -
+
+TOMADOR DO SERVIÇO
+------------------
+CNPJ / CPF / NIF: 42.426.406/0001-80
+Inscrição Municipal: 5.567.890-1
+Telefone: (11) 5549-8080
+Nome / Nome Empresarial: Laboratório Diagnóstico Vital Ltda
+E-mail: ti@labvital.com.br
+Endereço: Rua Borges Lagoa, 1080, Vila Clementino
+Município: São Paulo - SP
+CEP: 04038-002
+
+INTERMEDIÁRIO DO SERVIÇO
+------------------------
+NÃO IDENTIFICADO NA NFS-e
+
+SERVIÇO PRESTADO
+----------------
+Código de Tributação Nacional: 01.01.01 - Análise e desenvolvimento de sistemas
+Código de Tributação Municipal: 01010
+Local da Prestação: São Paulo - SP
+País da Prestação: Brasil
+Descrição do Serviço: Desenvolvimento de painel de liberação de laudos para pacientes.
+
+TRIBUTAÇÃO MUNICIPAL
+--------------------
+Tributação do ISSQN: Operação Tributável
+País Resultado da Prestação do Serviço: -
+Município de Incidência do ISSQN: São Paulo - SP
+Regime Especial de Tributação: Nenhum
+Valor do Serviço: R$ 3.460,00
+Desconto Incondicionado: -
+Total Deduções/Reduções: -
+Cálculo do BM: -
+BC ISSQN: -
+Alíquota Aplicada: -
+Retenção do ISSQN: Não Retido
+ISSQN Apurado: -
+
+TRIBUTAÇÃO FEDERAL
+------------------
+IRRF: -
+Contribuição Previdenciária - Retida: -
+CSLL: -
+PIS: -
+COFINS: -
+
+VALOR TOTAL DA NFS-E
+--------------------
+Valor do Serviço: R$ 3.460,00
+Desconto Condicionado: R$ 0,00
+Desconto Incondicionado: R$ 0,00
+ISSQN Retido: -
+IRRF, CP, CSLL - Retidos: R$ 0,00
+PIS/COFINS Retidos: -
+Valor Líquido da NFS-e: R$ 3.460,00
+
+TOTAIS APROXIMADOS DOS TRIBUTOS
+-------------------------------
+Federais: -
+Estaduais: -
+Municipais: -
+
+INFORMAÇÕES COMPLEMENTARES
+--------------------------
+Prestador optante pelo SIMEI. ISSQN e tributos federais recolhidos mensalmente em valor fixo no DAS-MEI (LC 123/2006, art. 18-A). Não há retenção na fonte.

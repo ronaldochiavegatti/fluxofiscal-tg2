@@ -1,0 +1,16 @@
+# Provedor de dashboards do Grafana (US-10 / ADR-0007).
+# Lê os JSON versionados em app/services/grafana/dashboards/.
+
+apiVersion: 1
+
+providers:
+  - name: FluxoFiscal
+    orgId: 1
+    folder: FluxoFiscal
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

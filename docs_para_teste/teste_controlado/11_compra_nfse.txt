@@ -1,0 +1,91 @@
+DANFSe v1.0 - Documento Auxiliar da NFS-e
+NFS-e Nacional - Prefeitura do Município de São Paulo
+EMITIDA EM AMBIENTE DE PRODUÇÃO RESTRITA - SEM VALOR FISCAL
+
+Chave de Acesso da NFS-e: 35503081230102999000140000000000229126094516318647
+
+Número da NFS-e: 2291
+Competência da NFS-e: 12/09/2026
+Data e Hora da emissão da NFS-e: 12/09/2026 12:17:23
+Número da DPS: 2291
+Série da DPS: 900
+Data e Hora da emissão da DPS: 12/09/2026 12:17:23
+
+EMITENTE DA NFS-e  -  Prestador do Serviço
+------------------------------------------
+CNPJ / CPF / NIF: 30.102.999/0001-40
+Inscrição Municipal: 6.789.012-3
+Telefone: (11) 5085-3030
+Nome / Nome Empresarial: Coworking Espaço Central Ltda
+E-mail: faturamento@espacocentral.com.br
+Endereço: Rua Domingos de Morais, 2781 - 8º andar, Vila Mariana
+Município: São Paulo - SP
+CEP: 04035-001
+Simples Nacional na Data de Competência: Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)
+Regime de Apuração Tributária pelo SN: Regime de apuração dos tributos federais e municipal pelo SN
+
+TOMADOR DO SERVIÇO
+------------------
+CNPJ / CPF / NIF: 12.345.678/0001-90
+Inscrição Municipal: 1.234.567-8
+Telefone: (11) 3456-7890
+Nome / Nome Empresarial: Ronaldo Chiavegatti Serviços de TI MEI
+E-mail: contato@rcti.com.br
+Endereço: Rua das Palmeiras, 120 - Sala 4, Vila Mariana
+Município: São Paulo - SP
+CEP: 04101-000
+
+INTERMEDIÁRIO DO SERVIÇO
+------------------------
+NÃO IDENTIFICADO NA NFS-e
+
+SERVIÇO PRESTADO
+----------------
+Código de Tributação Nacional: 03.03.01 - Exploração de salões de festas, centro de convenções, escritórios virtuais, stands, quadras esportivas, estádios, ginásios, auditórios, casas de espetáculos e congêneres
+Código de Tributação Municipal: 03030
+Local da Prestação: São Paulo - SP
+País da Prestação: Brasil
+Descrição do Serviço: Mensalidade de estação de trabalho compartilhada (coworking) - competência 09/2026.
+
+TRIBUTAÇÃO MUNICIPAL
+--------------------
+Tributação do ISSQN: Operação Tributável
+País Resultado da Prestação do Serviço: -
+Município de Incidência do ISSQN: São Paulo - SP
+Regime Especial de Tributação: Nenhum
+Valor do Serviço: R$ 612,40
+Desconto Incondicionado: -
+Total Deduções/Reduções: -
+Cálculo do BM: -
+BC ISSQN: R$ 612,40
+Alíquota Aplicada: 2,00%
+Retenção do ISSQN: Não Retido
+ISSQN Apurado: R$ 12,25
+
+TRIBUTAÇÃO FEDERAL
+------------------
+IRRF: -
+Contribuição Previdenciária - Retida: -
+CSLL: -
+PIS: -
+COFINS: -
+
+VALOR TOTAL DA NFS-E
+--------------------
+Valor do Serviço: R$ 612,40
+Desconto Condicionado: R$ 0,00
+Desconto Incondicionado: R$ 0,00
+ISSQN Retido: -
+IRRF, CP, CSLL - Retidos: R$ 0,00
+PIS/COFINS Retidos: -
+Valor Líquido da NFS-e: R$ 612,40
+
+TOTAIS APROXIMADOS DOS TRIBUTOS
+-------------------------------
+Federais: -
+Estaduais: -
+Municipais: -
+
+INFORMAÇÕES COMPLEMENTARES
+--------------------------
+Documento emitido por ME/EPP optante pelo Simples Nacional. ISSQN apurado no DAS.

@@ -1,0 +1,85 @@
+name: Métricas DORA
+
+# Mede o próprio processo de engenharia, não o produto. As quatro métricas do
+# relatório DORA (Forsgren, Humble e Kim) são o instrumento de "mensuramento"
+# da esteira de CI/CD e viram evidência empírica na seção de resultados:
+#
+#   Frequência de implantação  — quantos deployments por semana
+#   Lead time para mudanças    — do primeiro commit até a imagem publicada
+#   Taxa de falha de mudanças  — % de deployments que precisaram de correção
+#   Tempo para restaurar       — do rótulo "incidente" até o fix na main
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # toda segunda, 06:00 em Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: read
+  issues: read
+  actions: read
+
+jobs:
+  # O coletor é implementado na US-08. Até lá este workflow existe para que a
+  # intenção fique versionada, mas não deve falhar toda segunda-feira: execução
+  # vermelha recorrente ensina a ignorar o painel de Actions, e é justamente
+  # esse painel que alimenta as métricas medidas aqui.
+  verificar:
+    name: O coletor já existe?
+    runs-on: ubuntu-latest
+    outputs:
+      pronto: ${{ steps.checar.outputs.pronto }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: checar
+        run: |
+          if [ -f tools/dora/coletar.py ]; then
+            echo "pronto=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pronto=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::tools/dora/coletar.py ainda não existe. A coleta de métricas DORA é a US-08 do backlog; até ela ser feita, este workflow é pulado de propósito."
+          fi
+
+  coletar:
+    name: Coletar e publicar
+    runs-on: ubuntu-latest
+    needs: verificar
+    if: needs.verificar.outputs.pronto == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Coletar métricas via API do GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          pip install httpx pyyaml
+          python tools/dora/coletar.py \
+            --repo "$REPO" \
+            --janela-dias 28 \
+            --saida metricas/dora.json \
+            --saida-prometheus metricas/dora.prom
+
+      - name: Publicar no Prometheus Pushgateway
+        if: vars.PUSHGATEWAY_URL != ''
+        env:
+          PUSHGATEWAY: ${{ vars.PUSHGATEWAY_URL }}
+        run: |
+          curl --data-binary @metricas/dora.prom \
+            "$PUSHGATEWAY/metrics/job/dora/repo/${{ github.event.repository.name }}"
+
+      - name: Resumo no relatório da execução
+        run: python tools/dora/formatar_resumo.py metricas/dora.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar histórico
+        uses: actions/upload-artifact@v4
+        with:
+          name: dora-${{ github.run_number }}
+          path: metricas/
+          retention-days: 365

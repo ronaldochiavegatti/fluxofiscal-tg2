@@ -1,0 +1,32 @@
+name: "Débito técnico"
+description: "Melhoria interna: refatoração, remoção de feature flag obsoleta, atualização de dependência."
+title: "chore: <resumo>"
+labels: ["tipo:débito-técnico"]
+body:
+  - type: textarea
+    id: situacao
+    attributes:
+      label: Situação atual
+    validations:
+      required: true
+
+  - type: textarea
+    id: custo
+    attributes:
+      label: Qual o custo de conviver com isso
+      description: "Lentidão para entregar, risco de defeito, custo de infraestrutura, dificuldade de operar."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+    validations:
+      required: true
+
+  - type: input
+    id: prazo
+    attributes:
+      label: Data limite
+      description: "Obrigatório para remoção de feature flag."

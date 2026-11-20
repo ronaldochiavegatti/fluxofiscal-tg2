@@ -1,0 +1,62 @@
+# Borda pública da VPS. O Caddy emite e renova o certificado HTTPS sozinho
+# (Let's Encrypt, com ZeroSSL de reserva) para os dois domínios.
+#
+# Dois hosts em vez de um só porque as rotas do SPA (/documents, /chat...)
+# colidem com os prefixos do gateway (/documents/, /agent/...).
+
+{$APP_DOMAIN} {
+	encode gzip
+	reverse_proxy frontend:80
+}
+
+www.{$APP_DOMAIN} {
+	redir https://{$APP_DOMAIN}{uri} permanent
+}
+
+{$API_DOMAIN} {
+	encode gzip
+
+	# ------------------------------------------------------------------
+	# Rotas que não podem ficar abertas na internet.
+	#
+	# O protótipo não tem autenticação (o e-mail viaja na requisição e
+	# ninguém confere quem pede), então a borda pública é o único lugar
+	# em que dá para fechar o que é destrutivo, interno ou só de
+	# desenvolvimento. O ambiente local não passa por aqui e continua com
+	# tudo liberado (Swagger, reset, roteiros de avaliação).
+	#
+	# Os matchers olham o caminho já decodificado ({path}), então
+	# "demo%40mei.com" vira "demo@mei.com" e "re%73et" vira "reset"; as
+	# expressões são buscas em qualquer ponto do caminho, para que barras
+	# duplicadas ("//billing//reset") não escapem — o NGINX do gateway
+	# normaliza o caminho antes de repassar.
+	# ------------------------------------------------------------------
+
+	# Reset de dados: só o usuário fixo da demonstração (o botão "resetar
+	# dados" do painel). Reset de qualquer outro e-mail é recusado.
+	@reset_alheio expression `{path}.matches("(?i)/reset(/|$)") && !{path}.matches("(?i)^/+(limits|billing|agent)/+reset/+demo@mei[.]com/*$") && !({path}.matches("(?i)^/+documents/+reset/*$") && {query.email} == "demo@mei.com")`
+	respond @reset_alheio `{"detail":"rota bloqueada no ambiente público"}` 403
+
+	# Rotas operacionais internas (/_interno/...): só de dentro da rede Docker.
+	@interno path_regexp interno (?i)/_interno(/|$)
+	respond @interno `{"detail":"rota bloqueada no ambiente público"}` 403
+
+	# Registro de consumo: quem grava são os serviços, pela rede interna.
+	# O extrato (GET) continua aberto para a demonstração.
+	@registro_consumo {
+		method POST
+		path_regexp consumo (?i)^/+billing/+usage/*$
+	}
+	respond @registro_consumo `{"detail":"rota bloqueada no ambiente público"}` 403
+
+	# Documentação automática do FastAPI: entrega o mapa de todas as rotas.
+	@documentacao path_regexp docs (?i)/(docs|redoc|openapi[.]json)(/|$)
+	respond @documentacao `{"detail":"rota bloqueada no ambiente público"}` 403
+
+	# Uploads de nota: o gateway já dá 120 s ao /documents/.
+	reverse_proxy api-gateway:80 {
+		transport http {
+			read_timeout 150s
+		}
+	}
+}

@@ -1,0 +1,56 @@
+name: Higiene de feature flags
+
+# Feature flag sem data de validade vira débito técnico permanente: o código
+# passa a ter dois caminhos vivos para sempre e a complexidade nunca volta ao
+# normal. Este workflow lê o inventário em docs/feature-flags.yaml, compara com
+# as flags realmente referenciadas no código e abre issue para as vencidas.
+
+on:
+  schedule:
+    - cron: "0 12 * * 1" # toda segunda, 09:00 em Brasília
+  pull_request:
+    paths:
+      - "docs/feature-flags.yaml"
+      - "app/services/**"
+      - "tools/flags/**"
+      - ".github/workflows/higiene-flags.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  auditar:
+    name: Auditar inventário de flags
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install pyyaml pytest
+
+      - name: Testes do auditor (US-16)
+        run: pytest tools/flags/ -q
+
+      - name: Flag usada no código precisa estar no inventário
+        run: |
+          python tools/flags/auditar.py \
+            --inventario docs/feature-flags.yaml \
+            --codigo app/services \
+            --modo estrito
+
+      - name: Abrir issue para flags vencidas
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python tools/flags/auditar.py \
+            --inventario docs/feature-flags.yaml \
+            --modo vencidas \
+            --abrir-issue \
+            --repo "${{ github.repository }}"

@@ -1,0 +1,91 @@
+DANFSe v1.0 - Documento Auxiliar da NFS-e
+NFS-e Nacional - Prefeitura do Município de São Paulo
+EMITIDA EM AMBIENTE DE PRODUÇÃO RESTRITA - SEM VALOR FISCAL
+
+Chave de Acesso da NFS-e: 35503081250663151000106000000000088726034674164590
+
+Número da NFS-e: 887
+Competência da NFS-e: 31/03/2026
+Data e Hora da emissão da NFS-e: 31/03/2026 16:29:11
+Número da DPS: 887
+Série da DPS: 900
+Data e Hora da emissão da DPS: 31/03/2026 16:29:11
+
+EMITENTE DA NFS-e  -  Prestador do Serviço
+------------------------------------------
+CNPJ / CPF / NIF: 50.663.151/0001-06
+Inscrição Municipal: 7.789.012-3
+Telefone: (11) 3045-3333
+Nome / Nome Empresarial: Nuvem Segura Hospedagem de Dados Ltda
+E-mail: cobranca@nuvemsegura.com.br
+Endereço: Rua Funchal, 418 - 5º andar, Vila Olímpia
+Município: São Paulo - SP
+CEP: 04551-060
+Simples Nacional na Data de Competência: Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)
+Regime de Apuração Tributária pelo SN: Regime de apuração dos tributos federais e municipal pelo SN
+
+TOMADOR DO SERVIÇO
+------------------
+CNPJ / CPF / NIF: 12.345.678/0001-90
+Inscrição Municipal: 1.234.567-8
+Telefone: (11) 3456-7890
+Nome / Nome Empresarial: Ronaldo Chiavegatti Serviços de TI MEI
+E-mail: contato@rcti.com.br
+Endereço: Rua das Palmeiras, 120 - Sala 4, Vila Mariana
+Município: São Paulo - SP
+CEP: 04101-000
+
+INTERMEDIÁRIO DO SERVIÇO
+------------------------
+NÃO IDENTIFICADO NA NFS-e
+
+SERVIÇO PRESTADO
+----------------
+Código de Tributação Nacional: 01.03.01 - Processamento, armazenamento ou hospedagem de dados, textos, imagens, vídeos, páginas eletrônicas, aplicativos e sistemas de informação, entre outros formatos, e congêneres
+Código de Tributação Municipal: 01030
+Local da Prestação: São Paulo - SP
+País da Prestação: Brasil
+Descrição do Serviço: Hospedagem de sites e servidor de e-mail - plano anual, parcela 03/12.
+
+TRIBUTAÇÃO MUNICIPAL
+--------------------
+Tributação do ISSQN: Operação Tributável
+País Resultado da Prestação do Serviço: -
+Município de Incidência do ISSQN: São Paulo - SP
+Regime Especial de Tributação: Nenhum
+Valor do Serviço: R$ 89,00
+Desconto Incondicionado: -
+Total Deduções/Reduções: -
+Cálculo do BM: -
+BC ISSQN: R$ 89,00
+Alíquota Aplicada: 2,00%
+Retenção do ISSQN: Não Retido
+ISSQN Apurado: R$ 1,78
+
+TRIBUTAÇÃO FEDERAL
+------------------
+IRRF: -
+Contribuição Previdenciária - Retida: -
+CSLL: -
+PIS: -
+COFINS: -
+
+VALOR TOTAL DA NFS-E
+--------------------
+Valor do Serviço: R$ 89,00
+Desconto Condicionado: R$ 0,00
+Desconto Incondicionado: R$ 0,00
+ISSQN Retido: -
+IRRF, CP, CSLL - Retidos: R$ 0,00
+PIS/COFINS Retidos: -
+Valor Líquido da NFS-e: R$ 89,00
+
+TOTAIS APROXIMADOS DOS TRIBUTOS
+-------------------------------
+Federais: -
+Estaduais: -
+Municipais: -
+
+INFORMAÇÕES COMPLEMENTARES
+--------------------------
+Documento emitido por ME/EPP optante pelo Simples Nacional. ISSQN apurado no DAS.

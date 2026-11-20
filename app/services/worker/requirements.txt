@@ -1,0 +1,19 @@
+celery[redis]==5.4.0
+# kombu 5.7 exige redis-py >= 6.1 (VersionMismatch na conexão); fixar até subir o redis.
+kombu==5.4.2
+redis==5.2.1
+structlog==24.4.0
+
+# US-18: a tarefa processar_documento chama a rota interna do documents.
+httpx==0.28.1
+
+# Rastreamento distribuído (US-12). Inerte sem OTEL_TRACES_ENABLED=true.
+opentelemetry-sdk==1.29.0
+opentelemetry-exporter-otlp-proto-http==1.29.0
+opentelemetry-instrumentation-celery==0.50b0
+
+# Feature flags (US-15). Inerte sem UNLEASH_URL; ver ADR-0008.
+UnleashClient==6.8.0
+# yggdrasil-engine 2.0 quebrou a ABI usada pelo UnleashClient 6.8 (count_toggle
+# levanta ctypes.ArgumentError e toda flag cai no padrão). Fixar até subir o SDK.
+yggdrasil-engine==1.3.1

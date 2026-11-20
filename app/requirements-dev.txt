@@ -1,0 +1,44 @@
+# Dependências de teste, compartilhadas pelos cinco serviços Python.
+#
+# Ficam num arquivo só, na raiz de `app/`, pelo mesmo motivo do ruff.toml: são
+# as mesmas ferramentas em todos os serviços, e cinco cópias divergem com o
+# tempo. Cada serviço continua com o seu requirements.txt de produção — o que
+# entra na imagem é só aquele.
+
+pytest==8.3.3
+pytest-cov==5.0.0
+
+# Presos por versão de propósito. Com lint bloqueante, um ruff novo com
+# regra nova reprovaria um PR que não mudou nada — a atualização passa a
+# ser uma decisão, com o seu próprio commit.
+ruff==0.16.4
+mypy==2.3.1
+
+# TestClient do FastAPI e duplos de cliente HTTP nos testes do Documents.
+httpx==0.28.1
+
+# O anyio 4.15.0 (02/09/2026) passou a emitir DeprecationWarning ao acessar
+# `anyio.abc.BlockingPortal`, que o starlette 0.38 — versão presa pelo
+# fastapi 0.115 — ainda usa na importação do TestClient. Com `filterwarnings
+# = error` nos pytest.ini, isso derruba a coleta antes de qualquer teste
+# rodar. Preso abaixo de 4.15 até o fastapi/starlette subirem.
+anyio<4.15
+
+# US-04: a integração do Limits roda contra um PostgreSQL 16 de verdade, e não
+# contra SQLite. As consultas com func.extract() compilam para dialetos
+# diferentes nos dois bancos — testar só no SQLite não prova nada sobre o que
+# roda em produção.
+testcontainers[postgres]==4.8.2
+psycopg2-binary==2.9.10
+
+# US-04: verificação de contrato contra o OpenAPI que o próprio serviço expõe.
+# Preso à linha 3.x: a 4.x reorganizou a API pública (`schemathesis.openapi.*`).
+schemathesis==3.39.16
+
+# US-20: mock em memória do MongoDB, com enforcement de índice único — é o que
+# deixa o teste de deduplicação exercitar o caminho real, sem subir o Mongo.
+mongomock==4.3.0
+
+# US-21: Redis (incl. Streams e grupos de consumidores) em memória — exercita o
+# Outbox e o consumidor idempotente sem subir o Redis.
+fakeredis==2.38.0

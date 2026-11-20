@@ -1,0 +1,10 @@
+{
+  "_comentario": "Quem depende das respostas de cada serviço. Alimenta a mensagem de erro do verificar.py (US-47). Fontes: chamadas HTTP síncronas hoje + tabela de eventos do ADR-0006. Manter em dia quando uma integração nova entrar.",
+  "auth": ["frontend"],
+  "billing": ["frontend"],
+  "limits": ["frontend", "agent-orchestrator", "documents", "insights"],
+  "documents": ["frontend"],
+  "agent-orchestrator": ["frontend", "documents"],
+  "insights": ["frontend"],
+  "notifications": ["frontend"]
+}

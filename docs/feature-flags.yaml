@@ -1,0 +1,324 @@
+# Inventário de feature flags — fonte da verdade
+#
+# Toda flag usada no código precisa estar declarada aqui. O workflow
+# .github/workflows/higiene-flags.yml compara este arquivo com o código real e
+# falha o PR quando encontra flag não declarada ou declarada e não usada.
+#
+# Flag sem data de remoção é débito técnico permanente: o código passa a ter
+# dois caminhos vivos para sempre. Por isso `remover_ate` é obrigatório para os
+# tipos release e experiment.
+#
+# Tipos (taxonomia de Pete Hodgson):
+#   release     esconde trabalho em andamento           — remover após liberação
+#   experiment  compara variantes com usuários          — remover após decisão
+#   ops         chave de desligamento de emergência     — permanente, revisar
+#   permission  habilita recurso para um perfil         — permanente
+
+versao: 1
+dono_padrao: ronaldo
+
+flags:
+  # =========================================================================
+  # Onda 3 — arquitetura assíncrona
+  # =========================================================================
+  - nome: ocr-assincrono
+    tipo: release
+    descricao: >
+      Upload responde 202 Accepted e o processamento vai para a fila Celery,
+      em vez de rodar dentro da requisição HTTP.
+    quando_desligada: >
+      Comportamento atual: OCR e extração acontecem de forma síncrona e a
+      resposta só volta ao fim, em cerca de 4,5 segundos.
+    padrao_seguro: false
+    servicos: [documents, frontend]
+    estrategia: liberacao_percentual
+    remover_ate: 2027-01-31
+    adr: 0003
+    risco: alto
+    nota: >
+      Chave de desligamento mais importante do plano. Muda o contrato do
+      endpoint de upload e toda a experiência da tela.
+
+  - nome: storage-minio
+    tipo: release
+    descricao: Arquivos gravados no MinIO em vez do volume local.
+    quando_desligada: Grava em /data/uploads, como hoje.
+    padrao_seguro: false
+    servicos: [documents, worker]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-01-31
+    adr: 0004
+    risco: alto
+    nota: >
+      Durante a transição a leitura tenta MinIO e cai para o volume local se
+      não encontrar, o que permite migrar os arquivos existentes sem parada.
+
+  - nome: documentos-persistidos
+    tipo: release
+    descricao: Metadados e ciclo de vida do documento gravados no MongoDB.
+    quando_desligada: Metadados só na resposta HTTP e no localStorage.
+    padrao_seguro: false
+    servicos: [documents, frontend]
+    estrategia: liberacao_percentual
+    remover_ate: 2027-01-31
+    adr: 0005
+    risco: medio
+
+  - nome: eventos-outbox
+    tipo: release
+    descricao: Publicação de eventos de domínio via Outbox e Redis Streams.
+    quando_desligada: Chamadas REST diretas entre serviços, como hoje.
+    padrao_seguro: false
+    servicos: [limits, documents, billing, insights]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-01-31
+    adr: 0006
+    risco: alto
+
+  # =========================================================================
+  # Onda 4 — dashboard e ritmo de vendas
+  # =========================================================================
+  - nome: dashboard-v2
+    tipo: release
+    descricao: >
+      Novo dashboard com gauge do limite, gráfico de corrida contra o teto,
+      painel de ritmo e tiles com minigráficos.
+    quando_desligada: Dashboard atual, com barra de progresso linear.
+    padrao_seguro: false
+    servicos: [frontend]
+    estrategia: liberacao_percentual
+    remover_ate: 2027-03-31
+    adr: 0009
+    risco: baixo
+    nota: >
+      Liberação gradual permite comparar as duas variantes por métrica de
+      interface, o que sustenta a avaliação de usabilidade do artigo.
+
+  - nome: alertas-ritmo-vendas
+    tipo: release
+    descricao: >
+      Motor de projeção e alertas de ritmo: índice de ritmo, data prevista de
+      estouro e faturamento seguro por mês.
+    quando_desligada: Só o alerta de 80% do limite que já existe.
+    padrao_seguro: false
+    servicos: [insights, notifications, frontend]
+    estrategia: segmento_por_faixa_de_uso
+    remover_ate: 2027-03-31
+    risco: medio
+    nota: >
+      Liberar primeiro para quem já passou de 50% do limite — quem tem mais a
+      ganhar e cujo feedback é mais informativo.
+
+  - nome: limite-proporcional
+    tipo: release
+    descricao: >
+      Aplica o limite proporcional aos meses de atividade quando o MEI foi
+      aberto no ano corrente.
+    quando_desligada: Sempre R$ 81.000,00, independentemente da abertura.
+    padrao_seguro: false
+    servicos: [limits, insights]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-03-31
+    risco: medio
+    nota: >
+      Correção de regra fiscal. Hoje o sistema diz que um MEI aberto em julho
+      está seguro quando ele já pode ter estourado o teto proporcional.
+
+  - nome: lancamento-manual
+    tipo: release
+    descricao: Registrar venda ou compra pela interface, sem enviar documento.
+    quando_desligada: Só via upload de documento.
+    padrao_seguro: false
+    servicos: [frontend]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-03-31
+    risco: baixo
+
+  - nome: simulador-faturamento
+    tipo: release
+    descricao: Simula o impacto de um valor futuro na projeção e no nível de alerta.
+    quando_desligada: Sem simulador.
+    padrao_seguro: false
+    servicos: [insights, frontend]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-03-31
+    risco: baixo
+
+  # =========================================================================
+  # Onda 6 — contexto do agente
+  # =========================================================================
+  - nome: rag-busca-hibrida
+    tipo: experiment
+    descricao: Fusão RRF entre busca vetorial e busca textual.
+    quando_desligada: Só busca vetorial por distância de cosseno.
+    padrao_seguro: false
+    servicos: [agent-orchestrator]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-02-28
+    adr: null
+    risco: baixo
+    metrica_de_decisao: acerto_primeira_posicao no conjunto de 30 perguntas
+
+  - nome: rag-reordenacao-mmr
+    tipo: experiment
+    descricao: Reordenação por relevância marginal máxima, para diversidade.
+    quando_desligada: Ordem bruta da busca.
+    padrao_seguro: false
+    servicos: [agent-orchestrator]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-02-28
+    risco: baixo
+    metrica_de_decisao: fidelidade e acerto entre os 5
+
+  - nome: rag-limiar-similaridade
+    tipo: release
+    descricao: Descarta trechos com distância de cosseno acima de 0,45.
+    quando_desligada: Sempre devolve os 3 primeiros, por pior que sejam.
+    padrao_seguro: false
+    servicos: [agent-orchestrator]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-01-31
+    risco: medio
+    metrica_de_decisao: abstenção correta nas 10 perguntas fora do domínio
+
+  - nome: contexto-memoria-longa
+    tipo: release
+    descricao: Memória de longo prazo com fatos estáveis sobre o MEI.
+    quando_desligada: Sem memória entre conversas.
+    padrao_seguro: false
+    servicos: [agent-orchestrator]
+    estrategia: liberacao_percentual
+    remover_ate: 2027-02-28
+    risco: medio
+    nota: Envolve dado pessoal derivado; exige tela de visualização e remoção.
+
+  - nome: contexto-resumo-progressivo
+    tipo: release
+    descricao: Resume turnos antigos a cada 10 mensagens para liberar janela.
+    quando_desligada: Só os últimos turnos entram, sem resumo.
+    padrao_seguro: false
+    servicos: [agent-orchestrator, worker]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-02-28
+    risco: baixo
+
+  - nome: contexto-orcamento-tokens
+    tipo: release
+    descricao: Montagem em camadas com orçamento e truncamento por prioridade.
+    quando_desligada: Concatenação direta, como hoje.
+    padrao_seguro: false
+    servicos: [agent-orchestrator]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-02-28
+    risco: medio
+
+  - nome: billing-tokens-reais
+    tipo: release
+    descricao: Cobrança pelo consumo medido de tokens, debitada no servidor.
+    quando_desligada: Tabela de custo fixo por ação, debitada pelo frontend.
+    padrao_seguro: false
+    servicos: [billing, documents, agent-orchestrator, frontend]
+    estrategia: liberacao_percentual
+    remover_ate: 2027-02-28
+    adr: 0012
+    risco: alto
+    nota: Muda o que o usuário paga. Exige extrato visível antes de ligar.
+
+  # =========================================================================
+  # Operacionais — permanentes
+  # =========================================================================
+  - nome: ops-desligar-gemini
+    tipo: ops
+    descricao: >
+      Desliga toda chamada à API do Gemini e força o modo demonstração.
+    quando_desligada: Chamadas normais ao modelo.
+    padrao_seguro: true
+    servicos: [documents, agent-orchestrator, worker]
+    estrategia: tudo_ou_nada
+    remover_ate: null
+    revisar_em: 2027-06-30
+    risco: baixo
+    nota: >
+      Para quando o fornecedor estiver instável, a cota estourar ou o custo
+      disparar. Degrada a qualidade sem derrubar a plataforma.
+
+  - nome: ops-modo-somente-leitura
+    tipo: ops
+    descricao: Bloqueia escrita durante manutenção ou migração.
+    quando_desligada: Operação normal.
+    padrao_seguro: true
+    servicos: [limits, documents, billing, insights]
+    estrategia: tudo_ou_nada
+    remover_ate: null
+    revisar_em: 2027-06-30
+    risco: baixo
+
+  - nome: ops-limite-taxa-agressivo
+    tipo: ops
+    descricao: Reduz o limite de requisições por usuário sob carga anormal.
+    quando_desligada: Limites normais.
+    padrao_seguro: true
+    servicos: [api-gateway]
+    estrategia: tudo_ou_nada
+    remover_ate: null
+    revisar_em: 2027-06-30
+    risco: baixo
+
+  # =========================================================================
+  # Redesign visual (apresentação TG II)
+  # =========================================================================
+  - nome: visual-novo
+    tipo: release
+    descricao: >
+      Identidade visual nova do frontend: tema claro "papel" com acento azul
+      reservado a ação, tema escuro opcional com seletor, régua do limite no
+      topo do painel, botão padronizado e esqueletos de carregamento.
+    quando_desligada: Visual atual (azul-noite com gradientes índigo).
+    padrao_seguro: false
+    servicos: [frontend]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-02-28
+    risco: baixo
+    nota: >
+      Só troca apresentação: as paletas moram em tailwind.config.js e a flag
+      apenas escolhe qual vale (data-visual no <html>). Ver
+      docs/redesign-visual.md.
+
+  - nome: metricas-configuraveis
+    tipo: release
+    descricao: >
+      Regras fiscais e metas do painel configuráveis por usuário: teto anual,
+      margem de desenquadramento, limite proporcional e data de abertura,
+      faixa de alerta, meta mensal, alerta de concentração de cliente e os
+      limiares da projeção de ritmo. Tela de Configurações no frontend.
+    quando_desligada: >
+      Regras usam os valores oficiais padrão; a configuração gravada é
+      ignorada e o item Configurações some do menu.
+    padrao_seguro: false
+    servicos: [limits, frontend]
+    estrategia: tudo_ou_nada
+    remover_ate: 2027-03-31
+    adr: 0022
+    risco: medio
+    nota: >
+      Muda o resultado de regra fiscal para quem configurar. A validação de
+      faixas é do domínio (`ParametrosFiscais`). Ver issue #91.
+
+  # =========================================================================
+  # Permissão
+  # =========================================================================
+  - nome: perfil-modo-avaliacao
+    tipo: permission
+    descricao: >
+      Habilita o painel de demonstração para a banca: dados sintéticos
+      pré-carregados, reset rápido e atalhos para cada cenário de alerta.
+    quando_desligada: Interface normal.
+    padrao_seguro: false
+    servicos: [frontend, insights]
+    estrategia: por_usuario
+    remover_ate: null
+    revisar_em: 2027-06-30
+    risco: baixo
+    nota: >
+      Vale muito no dia da defesa: permite demonstrar o alerta de estouro sem
+      precisar cadastrar R$ 81.000,00 em transações ao vivo.

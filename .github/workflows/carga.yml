@@ -1,0 +1,103 @@
+name: Carga
+
+# US-14 — testes de carga. Este workflow roda um SMOKE curto a cada PR que
+# mexe nos cenários ou no que eles exercitam: sobe o Compose, roda o k6 com
+# poucos VUs por ~1 min e confere que os cenários funcionam e produzem os
+# JSON que alimentam a seção de resultados do artigo.
+#
+# O run COMPLETO (50 VUs, 10 min + estresse até 200 VUs) é o do pipeline
+# noturno (benchmarks.yml), que usa os mesmos scripts.
+
+on:
+  pull_request:
+    paths:
+      - "tests/load/**"
+      - "tests/benchmarks/**"
+      - "app/services/limits/**"
+      - "app/docker-compose.yml"
+      - ".github/workflows/carga.yml"
+  workflow_dispatch:
+    inputs:
+      completo:
+        description: "Rodar o perfil completo (50 VUs, 10 min)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: app
+
+jobs:
+  carga:
+    name: Smoke de carga (k6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Subir o ambiente
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          cp .env.example .env
+          echo "GEMINI_API_KEY=" >> .env
+          docker compose up -d --build --wait --wait-timeout 720
+
+      - name: Testes dos verificadores
+        run: |
+          pip install pyyaml pytest
+          pytest tests/benchmarks/ -q
+
+      - name: Instalar k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Perfil realista de MEI (smoke)
+        env:
+          VUS: ${{ github.event.inputs.completo == 'true' && '50' || '10' }}
+          DURACAO: ${{ github.event.inputs.completo == 'true' && '10m' || '45s' }}
+        run: |
+          mkdir -p resultados
+          k6 run -e VUS=$VUS -e DURACAO=$DURACAO tests/load/perfil-mei.js
+
+      - name: Estresse até o ponto de saturação (recorte)
+        env:
+          PICO: ${{ github.event.inputs.completo == 'true' && '200' || '30' }}
+          PASSO: ${{ github.event.inputs.completo == 'true' && '1m' || '10s' }}
+        run: k6 run -e PICO=$PICO -e PASSO=$PASSO tests/load/estresse.js
+
+      - name: Conferir contra os SLOs
+        run: |
+          MODO=${{ github.event.inputs.completo == 'true' && 'gate' || 'smoke' }}
+          python tests/benchmarks/verificar_slos.py \
+            --entrada resultados --slos docs/observabilidade/slos.yaml --modo "$MODO"
+
+      - name: Gerar tabelas para o artigo
+        run: |
+          python tests/benchmarks/gerar_tabelas.py \
+            --entrada resultados --saida resultados/tabelas-artigo.md
+          cat resultados/tabelas-artigo.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carga-${{ github.run_number }}
+          path: resultados/
+          retention-days: 90
+
+      - name: Logs em caso de falha
+        if: failure()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose logs --tail=200
+
+      - name: Derrubar o ambiente
+        if: always()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose down -v

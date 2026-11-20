@@ -1,0 +1,53 @@
+name: "Defeito"
+description: "Comportamento diferente do esperado em algo que já foi entregue."
+title: "fix: <resumo do defeito>"
+labels: ["tipo:defeito"]
+body:
+  - type: dropdown
+    id: servico
+    attributes:
+      label: Serviço afetado
+      options: [auth, billing, limits, documents, agent-orchestrator, insights, notifications, worker, frontend, api-gateway, infraestrutura]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severidade
+    attributes:
+      label: Severidade
+      options:
+        - "S1 — plataforma indisponível ou dado fiscal incorreto"
+        - "S2 — funcionalidade principal quebrada, sem contorno"
+        - "S3 — funcionalidade degradada, com contorno"
+        - "S4 — cosmético"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Passos para reproduzir
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Comportamento esperado × observado
+    validations:
+      required: true
+
+  - type: input
+    id: trace
+    attributes:
+      label: trace_id / correlation-id
+      description: "Disponível no cabeçalho X-Correlation-Id da resposta e nos logs do Loki."
+
+  - type: textarea
+    id: evidencia
+    attributes:
+      label: Logs, print ou painel

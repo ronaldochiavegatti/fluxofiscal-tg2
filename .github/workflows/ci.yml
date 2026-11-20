@@ -1,0 +1,344 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Um push novo cancela a execução anterior da mesma referência: economiza
+# minutos e mantém o feedback rápido (lead time é uma das métricas DORA).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: app
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+
+jobs:
+  # ------------------------------------------------------------------
+  # Portão 1 — higiene do histórico e dos segredos
+  # ------------------------------------------------------------------
+  historico:
+    name: Histórico e segredos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # O gitleaks-action consulta GET /repos/{repo}/pulls/{n}/commits para
+      # varrer só o que o PR introduz. Sem esta permissão ele recebe 403 e
+      # o processo Node morre com exceção não tratada.
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Título do PR segue Conventional Commits
+        if: github.event_name == 'pull_request'
+        env:
+          TITULO: ${{ github.event.pull_request.title }}
+        run: |
+          padrao='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .{1,80}$'
+          if ! printf '%s' "$TITULO" | grep -qE "$padrao"; then
+            echo "::error::Título fora do padrão Conventional Commits: $TITULO"
+            echo "Exemplo válido: feat(dashboard): adiciona gauge do limite anual"
+            exit 1
+          fi
+
+      - name: Varredura de segredos (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ------------------------------------------------------------------
+  # Portão 2 — qualidade dos serviços Python
+  # ------------------------------------------------------------------
+  backend:
+    name: Backend · ${{ matrix.servico }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servico: [auth, billing, limits, documents, agent-orchestrator, insights, notifications, worker]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Instalar dependências
+        working-directory: ${{ env.APP_DIR }}/services/${{ matrix.servico }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r ../../requirements-dev.txt
+
+      # Bloqueantes desde a US-04. Deixaram de ser avisos quando a suíte de
+      # testes passou a existir: portão de lint sem teste embaixo reprova
+      # formatação e deixa passar defeito, o que ensina a ignorar o portão.
+      - name: Lint (ruff)
+        working-directory: ${{ env.APP_DIR }}/services/${{ matrix.servico }}
+        run: ruff check app/ tests/ --output-format=github
+
+      - name: Formatação (ruff format)
+        working-directory: ${{ env.APP_DIR }}/services/${{ matrix.servico }}
+        run: ruff format --check app/ tests/
+
+      - name: Tipos (mypy)
+        working-directory: ${{ env.APP_DIR }}/services/${{ matrix.servico }}
+        # Segue informativo. O código legado tem anotação parcial, e tornar o
+        # mypy bloqueante agora significaria anotar cinco serviços num PR só.
+        # Entra junto com a família ANN do ruff, na Onda 1.
+        continue-on-error: true
+        run: mypy app/ --ignore-missing-imports
+
+      # Roda a suíte inteira: unidade, contrato contra o OpenAPI e — no Limits —
+      # integração contra um PostgreSQL 16 real, subido por testcontainers no
+      # Docker do próprio runner.
+      - name: Testes com cobertura
+        working-directory: ${{ env.APP_DIR }}/services/${{ matrix.servico }}
+        env:
+          COBERTURA_MINIMA: "80" # ADR-0013: mínimo por serviço
+        run: |
+          pytest tests/ --cov=app --cov-report=xml --cov-report=term-missing \
+            --cov-fail-under="$COBERTURA_MINIMA"
+
+      - name: Publicar cobertura
+        if: hashFiles(format('{0}/services/{1}/coverage.xml', env.APP_DIR, matrix.servico)) != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-${{ matrix.servico }}
+          path: ${{ env.APP_DIR }}/services/${{ matrix.servico }}/coverage.xml
+          retention-days: 30
+
+  # ------------------------------------------------------------------
+  # Portão 3 — qualidade do frontend
+  # ------------------------------------------------------------------
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app/services/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: app/services/frontend/package-lock.json
+
+      - run: npm ci
+
+      - name: Tipos (tsc)
+        run: npx tsc --noEmit
+
+      # Bloqueantes desde já: diferente do backend, o frontend passa limpo
+      # em ambos, então não há razão para começar com portão frouxo.
+      - name: Lint (eslint)
+        run: npm run lint -- --max-warnings=0
+
+      - name: Testes (vitest)
+        run: npm run test:cov
+
+      - name: Publicar cobertura do frontend
+        if: always() && hashFiles('app/services/frontend/coverage/lcov.info') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-frontend
+          path: app/services/frontend/coverage/lcov.info
+          retention-days: 30
+
+      - name: Build de produção
+        run: npm run build
+
+  # ------------------------------------------------------------------
+  # Portão 4 — as imagens constroem e o ambiente sobe de verdade
+  # ------------------------------------------------------------------
+  integracao:
+    name: Integração (docker compose)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Criar .env de teste
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          cp .env.example .env
+          # Sem GEMINI_API_KEY os serviços entram em modo demo. É isso que
+          # queremos na CI: nenhum teste depende de API externa paga.
+          echo "GEMINI_API_KEY=" >> .env
+          # US-21: liga o barramento de eventos sem depender do Unleash, para o
+          # teste de caos abaixo. Em produção a flag `eventos-outbox` decide.
+          echo "FORCAR_EVENTOS_OUTBOX=true" >> .env
+
+      - name: Subir o ambiente
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose up -d --build --wait --wait-timeout 720
+
+      - name: Smoke test dos healthchecks
+        run: |
+          # O --wait já espera todos os serviços ficarem saudáveis, mas a
+          # publicação da porta 8000 no host pode chegar alguns instantes
+          # depois. Tentar de novo aqui evita vermelho por corrida de rede.
+          falhou=0
+          for s in auth billing documents limits agent insights notifications; do
+            ok=0
+            for tentativa in 1 2 3 4 5 6; do
+              resp=$(curl -sf --max-time 10 "http://localhost:8000/$s/health" || echo ERRO)
+              if echo "$resp" | grep -q '"status":"ok"'; then
+                echo "OK $s (tentativa $tentativa)"
+                ok=1
+                break
+              fi
+              sleep 5
+            done
+            if [ "$ok" -eq 0 ]; then
+              echo "::error::healthcheck de $s falhou após 6 tentativas: $resp"
+              falhou=1
+            fi
+          done
+          exit $falhou
+
+      - name: Teste de fluxo ponta a ponta
+        run: |
+          EMAIL="ci-$(date +%s)@mei.com"
+          ANO=$(date +%Y)
+          curl -sf -X POST http://localhost:8000/limits/transactions \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"$EMAIL\",\"amount\":5000.00,\"tx_date\":\"$ANO-03-10\",\"tx_type\":\"venda\",\"source\":\"ci\"}" > /dev/null
+          resumo=$(curl -sf "http://localhost:8000/limits/summary/$EMAIL")
+          echo "$resumo"
+          echo "$resumo" | grep -q '"total_revenue":5000' || { echo "::error::resumo anual não refletiu a venda"; exit 1; }
+          echo "$resumo" | grep -q '"annual_limit":81000' || { echo "::error::limite anual do MEI incorreto"; exit 1; }
+
+      - name: Eventos — sem perda com consumidor fora do ar (US-21)
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -euo pipefail
+          EMAIL="caos-$(date +%s)@mei.com"
+          ANO=$(date +%Y)
+          criar() {
+            curl -sf -X POST http://localhost:8000/limits/transactions \
+              -H "Content-Type: application/json" \
+              -d "{\"email\":\"$EMAIL\",\"amount\":$1,\"tx_date\":\"$ANO-03-10\",\"tx_type\":\"venda\",\"source\":\"caos\"}" > /dev/null
+          }
+          # 5 transações com o Insights de pé
+          for _ in 1 2 3 4 5; do criar 100; done
+
+          # Insights cai; mais 5 transações são criadas
+          docker compose stop insights
+          for _ in 1 2 3 4 5; do criar 100; done
+
+          # Insights volta
+          docker compose start insights
+          for t in $(seq 1 24); do
+            curl -sf --max-time 5 http://localhost:8000/insights/health | grep -q '"status":"ok"' && break
+            sleep 5
+          done
+
+          # Ele precisa ter processado os 10 e zerado o backlog
+          for t in $(seq 1 20); do
+            status=$(curl -sf http://localhost:8000/insights/_interno/status || echo '{}')
+            echo "tentativa $t: $status"
+            proc=$(echo "$status" | sed -n 's/.*"eventos_processados":\([0-9]*\).*/\1/p')
+            pend=$(echo "$status" | sed -n 's/.*"eventos_pendentes":\([0-9]*\).*/\1/p')
+            if [ "${proc:-0}" -ge 10 ] && [ "${pend:-1}" -eq 0 ]; then break; fi
+            sleep 3
+          done
+          [ "${proc:-0}" -ge 10 ] || { echo "::error::Insights não processou os 10 eventos ($status)"; exit 1; }
+          [ "${pend:-1}" -eq 0 ] || { echo "::error::sobrou backlog de eventos ($status)"; exit 1; }
+
+          resumo=$(curl -sf "http://localhost:8000/insights/resumo/$EMAIL")
+          echo "$resumo"
+          echo "$resumo" | grep -q '"total_vendas":1000' || { echo "::error::projeção do Insights não bateu"; exit 1; }
+
+      - name: Logs em caso de falha
+        if: failure()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose logs --tail=200
+
+      - name: Derrubar o ambiente
+        if: always()
+        working-directory: ${{ env.APP_DIR }}
+        run: docker compose down -v
+
+  # ------------------------------------------------------------------
+  # Portão 5 — segurança das dependências e do código
+  # ------------------------------------------------------------------
+  seguranca:
+    name: Segurança
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vulnerabilidades no sistema de arquivos (Trivy)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          # Vira "1" quando as dependências da Onda 0 estiverem atualizadas.
+          # Hoje o Documents carrega Pillow e python-multipart vulneráveis.
+          exit-code: "0"
+
+      # O envio para o Code Scanning exige GitHub Advanced Security, que não
+      # está disponível em repositório privado no plano gratuito. Enquanto o
+      # repositório for privado, o resultado fica como artefato e como saída
+      # legível no log. Os alertas de dependência continuam vindo do Dependabot,
+      # que funciona no plano gratuito.
+      - name: Relatório em SARIF para arquivamento
+        if: always()
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-fs.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-sarif
+          path: trivy-fs.sarif
+          retention-days: 30
+
+  # ------------------------------------------------------------------
+  # Resultado consolidado — este é o check exigido pela branch protection
+  # ------------------------------------------------------------------
+  ci-ok:
+    name: CI aprovada
+    runs-on: ubuntu-latest
+    needs: [historico, backend, frontend, integracao, seguranca]
+    if: always()
+    steps:
+      - name: Verificar se algum portão falhou
+        env:
+          RESULTADOS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTADOS"
+          if echo "$RESULTADOS" | grep -q '"result": *"failure"'; then
+            echo "::error::Ao menos um portão da CI falhou."
+            exit 1
+          fi
+          echo "Todos os portões passaram."

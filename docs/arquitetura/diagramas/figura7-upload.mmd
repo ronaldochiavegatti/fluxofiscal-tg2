@@ -1,0 +1,44 @@
+%% Figura 7 do artigo — upload, conferência e confirmação de nota fiscal.
+%% Conferido contra o código em 19/11/2026: frontend/src/pages/UploadPage.tsx,
+%% documents/app/main.py (/upload, /confirm) e documents/app/processamento.py
+%% (processar_arquivo, completar_cnpjs_pelo_ocr) e documents/app/consumo.py. Fluxo síncrono (padrão).
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant FE as Frontend (React)
+    participant GW as API Gateway
+    participant DO as Documentos
+    participant GE as Gemini API
+    participant LI as Limites
+    participant AG as Orquestrador do Agente
+    participant BI as Cobrança
+
+    U->>FE: seleciona e envia a nota fiscal
+    FE->>GW: POST /documents/upload (multipart)
+    GW->>DO: encaminha a requisição
+    Note over DO,GE: imagem ou PDF: Gemini e OCR em paralelo<br/>TXT: o texto lido do arquivo vai ao Gemini
+    par
+        DO->>GE: extrai valor, data, CNPJs e descrição (JSON)
+        GE-->>DO: campos estruturados
+    and
+        DO->>DO: OCR Tesseract
+    end
+    DO->>DO: completa CNPJ vazio com o OCR<br/>(regex só se o Gemini falhar)
+    DO-)BI: POST /usage (tokens da extração)<br/>só com a flag billing-tokens-reais, em segundo plano
+    DO-->>GW: campos extraídos (nada gravado em Limites)
+    GW-->>FE: resposta JSON
+    FE->>U: exibe os campos para conferência
+    U->>FE: corrige se preciso e confirma
+    FE->>GW: POST /documents/confirm
+    GW->>DO: encaminha a requisição
+    DO->>LI: POST /transactions
+    LI-->>DO: transação registrada
+    DO->>AG: POST /index-document (texto para o RAG, falha não bloqueia)
+    AG-)BI: POST /usage (embeddings da indexação)<br/>só com a flag, em segundo plano
+    DO-->>GW: confirmação
+    GW-->>FE: resposta JSON
+    FE->>GW: POST /billing/tokens/consume (document_confirm)
+    GW->>BI: encaminha (débito ignorado no modo ilimitado)
+    BI-->>GW: saldo atualizado
+    GW-->>FE: resposta JSON
+    FE->>U: painel atualizado com a nova venda ou compra

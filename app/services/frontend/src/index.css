@@ -1,0 +1,954 @@
+/* Sistema visual em Tailwind (ADR-0010, US-24).
+ *
+ * Cor literal mora só em `tailwind.config.js`. Aqui as classes compartilhadas
+ * (`.card`, `.cta`, `.pill`, ...) são montadas com `@apply` sobre os tokens.
+ * `preflight` está desligado (migração incremental), então `@layer base`
+ * carrega só o essencial de base que o app depende. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    @apply font-sans text-tinta;
+    line-height: 1.5;
+    font-weight: 400;
+
+    /* Cor por nível de ritmo (US-25), para o `fill` do gauge (Recharts não lê
+     * classe Tailwind). Sempre a partir do token — nunca hex aqui, é o que
+     * theme.guard.test.ts (US-24) reprova. */
+    --cor-ok: theme("colors.limite-ok.DEFAULT");
+    --cor-atencao: theme("colors.limite-atencao.DEFAULT");
+    --cor-risco: theme("colors.limite-risco.DEFAULT");
+    --cor-estourado: theme("colors.limite-estourado.DEFAULT");
+    --cor-estourado-forte: theme("colors.limite-estourado.forte");
+    /* US-26: acumulado real e linha de referência do gráfico de corrida. */
+    --cor-realizado: theme("colors.acento.DEFAULT");
+    --cor-referencia: theme("colors.tinta.suave");
+
+    /* "Mês a mês" (US-27): vendas, despesas e a linha de meta. Mês acima da
+     * meta usa `--cor-vendas-destaque` em vez de `--cor-vendas` — cor nunca é
+     * o único sinal (a tabela equivalente traz "Sim"/"Não" por extenso). */
+    --cor-vendas: theme("colors.acento.DEFAULT");
+    --cor-vendas-destaque: theme("colors.limite-ok.forte");
+    --cor-despesas: theme("colors.limite-atencao.DEFAULT");
+    --cor-meta: theme("colors.tinta.suave");
+    --cor-tooltip-fundo: theme("colors.fundo.card");
+    --cor-grade: theme("colors.borda.DEFAULT");
+
+    /* Paleta categórica (origem do faturamento): uma cor por cliente, do
+     * próprio tema. O 5º em diante repete — a lista ao lado nomeia cada um. */
+    --cor-serie-1: theme("colors.acento.DEFAULT");
+    --cor-serie-2: theme("colors.acento.ciano");
+    --cor-serie-3: theme("colors.limite-ok.DEFAULT");
+    --cor-serie-4: theme("colors.limite-atencao.DEFAULT");
+    --cor-serie-5: theme("colors.acento.brilho");
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-fundo bg-app bg-fixed antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-tinta-forte;
+    letter-spacing: -0.025em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply w-full rounded-campo border border-borda bg-veu/[0.03] p-3 font-sans text-tinta outline-none transition;
+    font-size: 15px;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply border-acento/60 shadow-foco;
+  }
+
+  label {
+    @apply mb-1.5 block font-semibold text-tinta-leve;
+  }
+}
+
+@layer components {
+  .app-shell {
+    display: grid;
+    grid-template-columns: 264px 1fr;
+    @apply min-h-screen;
+  }
+
+  .sidebar {
+    @apply sticky top-0 flex h-screen flex-col border-r border-borda-sutil bg-sidebar backdrop-blur-xl;
+    padding: 22px 16px;
+  }
+
+  .marca {
+    @apply mb-6 flex items-center gap-3 px-2;
+  }
+
+  .marca-logo {
+    @apply grid h-10 w-10 place-items-center rounded-xl bg-marca font-display text-lg font-extrabold text-sobre-acento shadow-cta;
+  }
+
+  .nav-secao {
+    @apply mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-tinta-suave;
+  }
+
+  .nav-link {
+    @apply mb-1 flex items-center gap-3 rounded-xl font-medium text-tinta-nav transition-colors;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .nav-link:hover {
+    @apply bg-veu/[0.04] text-tinta-forte;
+  }
+
+  .nav-link.active {
+    @apply bg-acento/15 text-tinta-forte;
+    box-shadow: inset 2px 0 0 theme("colors.acento.DEFAULT");
+  }
+
+  .nav-link svg {
+    @apply h-[18px] w-[18px] shrink-0 opacity-80;
+  }
+
+  .content {
+    /* `min-width: 0`: sem isto a coluna do grid cresce até caber o gráfico
+     * mais largo e o celular ganha rolagem horizontal. */
+    min-width: 0;
+    @apply mx-auto w-full;
+    max-width: 1320px;
+    padding: 32px 36px 48px;
+  }
+
+  .page-header {
+    @apply flex flex-wrap items-center justify-between gap-4;
+  }
+
+  .title {
+    @apply m-0;
+    font-size: 30px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    @apply mt-4 gap-4;
+  }
+
+  .card {
+    /* `min-width: 0`: item de grid não encolhe abaixo do conteúdo sem isto,
+     * e um gráfico largo empurraria a página para rolagem horizontal. */
+    min-width: 0;
+    @apply rounded-card border border-borda bg-fundo-card/70 p-5 shadow-card transition-colors;
+    backdrop-filter: blur(10px);
+  }
+
+  .card:hover {
+    @apply border-borda-forte;
+  }
+
+  .cta {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-campo border-none bg-cta font-semibold text-sobre-acento shadow-cta transition;
+    padding: 11px 18px;
+    font-size: 14px;
+  }
+
+  .cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+
+  .cta:disabled {
+    @apply cursor-not-allowed opacity-50;
+    transform: none;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-borda bg-veu/[0.04] font-medium text-tinta-leve;
+    padding: 5px 12px;
+    font-size: 12.5px;
+  }
+
+  .table {
+    @apply mt-3 w-full border-collapse text-sm;
+  }
+
+  .table th {
+    @apply border-b border-borda p-3 text-left text-xs font-semibold uppercase tracking-wide text-tinta-suave;
+  }
+
+  .table td {
+    @apply border-b border-borda-sutil p-3 text-left;
+  }
+
+  .table tbody tr {
+    @apply transition-colors;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-veu/[0.03];
+  }
+
+  .progress {
+    @apply h-2.5 w-full overflow-hidden rounded-full bg-veu/[0.06];
+  }
+
+  .progress-bar {
+    @apply h-full rounded-full bg-progresso transition-[width] duration-500;
+  }
+
+  .badge {
+    @apply rounded-full bg-veu/[0.07] font-medium text-tinta-leve;
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+
+  .muted {
+    @apply text-tinta-suave;
+    font-size: 14px;
+  }
+
+  .section {
+    @apply mt-6;
+  }
+
+  .flow {
+    @apply flex flex-wrap gap-2.5;
+  }
+
+  .chat-bubble {
+    @apply rounded-2xl border border-borda bg-veu/[0.04];
+    padding: 12px 16px;
+    max-width: 680px;
+  }
+
+  .chat-bubble.me {
+    @apply ml-auto border-acento/30 bg-chat-me;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    /* minmax(0, 1fr): a coluna não cresce para caber conteúdo sem quebra
+     * (navegação em faixa, gráficos) e o celular não rola na horizontal. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+  .content {
+    padding: 20px 16px 40px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Botão padrão (components/Botao.tsx). Vale nos dois visuais: as cores vêm
+ * dos tokens, que mudam com a flag `visual-novo`.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .botao {
+    @apply relative inline-flex min-h-[44px] cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-campo border border-transparent px-4 font-sans text-sm font-semibold no-underline;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease,
+      transform 100ms ease;
+  }
+
+  .botao-sm {
+    @apply min-h-[36px] px-3 text-[13px];
+  }
+
+  .botao svg {
+    @apply h-4 w-4 shrink-0;
+  }
+
+  .botao:focus-visible {
+    @apply shadow-foco outline-none;
+  }
+
+  .botao:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .botao:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .botao[aria-busy="true"] {
+    @apply cursor-progress opacity-80;
+  }
+
+  .botao-primario {
+    @apply bg-acento bg-cta text-sobre-acento shadow-cta;
+  }
+
+  .botao-primario:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  .botao-secundario {
+    @apply border-borda-forte bg-veu/[0.03] text-tinta;
+  }
+
+  .botao-secundario:hover:not(:disabled) {
+    @apply border-acento/50 bg-veu/[0.07];
+  }
+
+  .botao-discreto {
+    @apply bg-transparent text-acento-claro;
+  }
+
+  .botao-discreto:hover:not(:disabled) {
+    @apply bg-acento/10;
+  }
+
+  .botao-perigo {
+    @apply border-limite-estourado-borda bg-transparent text-limite-estourado;
+  }
+
+  .botao-perigo:hover:not(:disabled) {
+    @apply bg-limite-estourado-suave;
+  }
+
+  .botao-giro {
+    @apply h-4 w-4 shrink-0 rounded-full border-2 border-current;
+    border-right-color: transparent;
+    animation: girar 700ms linear infinite;
+  }
+
+  /* Esqueleto de carregamento: mesma forma do conteúdo que vai chegar. */
+  .esqueleto {
+    @apply rounded-campo bg-veu/[0.06];
+    animation: pulsar 1.4s ease-in-out infinite;
+  }
+
+  .seletor-tema {
+    @apply inline-flex gap-0.5 rounded-campo border border-borda p-0.5;
+  }
+
+  .seletor-tema-opcao {
+    @apply grid h-9 w-9 cursor-pointer place-items-center rounded-[calc(var(--raio-campo)-2px)] border-none bg-transparent text-tinta-suave transition-colors;
+  }
+
+  .seletor-tema-opcao svg {
+    @apply h-4 w-4;
+  }
+
+  .seletor-tema-opcao:hover {
+    @apply text-tinta-forte;
+  }
+
+  .seletor-tema-opcao[aria-checked="true"] {
+    @apply bg-veu/[0.08] text-tinta-forte;
+  }
+
+  .seletor-tema-opcao:focus-visible {
+    @apply shadow-foco outline-none;
+  }
+
+  /* -------------------------------------------------------------------------
+   * Régua do limite (components/ReguaLimite.tsx)
+   * ----------------------------------------------------------------------- */
+  .regua-frase,
+  .regua-previsao {
+    max-width: 62ch;
+  }
+
+  .valor {
+    font-stretch: 80%;
+    font-variant-numeric: tabular-nums;
+    @apply font-semibold text-tinta-forte;
+  }
+
+  .regua-frase {
+    @apply m-0 font-display font-medium leading-[1.15] text-tinta;
+    font-size: clamp(26px, 3.4vw, 40px);
+    letter-spacing: -0.015em;
+  }
+
+  .regua-previsao {
+    @apply mb-0 mt-3 text-[17px] leading-relaxed text-tinta-leve;
+  }
+
+  .regua-selo {
+    @apply mr-1 inline-block rounded-full px-2.5 py-0.5 align-[2px] text-[13px] font-semibold;
+  }
+
+  .regua-selo-ok {
+    @apply bg-limite-ok-suave text-limite-ok;
+  }
+
+  .regua-selo-atencao {
+    @apply bg-limite-atencao-suave text-limite-atencao;
+  }
+
+  .regua-selo-risco {
+    @apply bg-limite-atencao-suave text-limite-risco;
+  }
+
+  .regua-selo-estourado {
+    @apply bg-limite-estourado-suave text-limite-estourado;
+  }
+
+  .regua-trilho {
+    @apply relative mt-8 h-14 overflow-visible rounded-[4px] border border-borda-forte bg-fundo-poco;
+  }
+
+  .regua-preenchimento {
+    @apply absolute inset-y-0 left-0 rounded-l-[3px];
+    transform-origin: left center;
+    animation: regua-encher 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .regua-ok {
+    @apply bg-tinta-forte;
+  }
+
+  .regua-atencao {
+    @apply bg-limite-atencao-forte;
+  }
+
+  .regua-risco {
+    @apply bg-limite-risco;
+  }
+
+  .regua-estourado {
+    @apply bg-limite-estourado;
+  }
+
+  .regua-marca {
+    @apply absolute bottom-0 h-3 w-px bg-borda-forte;
+  }
+
+  .regua-hoje {
+    @apply absolute -inset-y-2 w-[3px] -translate-x-1/2 rounded-full bg-acento-ciano;
+  }
+
+  .regua-meses {
+    @apply mt-2 grid grid-cols-12 text-[12px] text-tinta-suave;
+  }
+
+  .regua-meses span {
+    @apply pl-1;
+  }
+
+  .regua-legenda {
+    @apply mt-3 flex items-center gap-2 text-sm text-tinta-suave;
+  }
+
+  .regua-legenda-hoje {
+    @apply inline-block h-3.5 w-[3px] rounded-full bg-acento-ciano;
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes regua-encher {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Visual novo (flag `visual-novo`): ajustes que não cabem só em token.
+ * ------------------------------------------------------------------------- */
+:root[data-visual="novo"] h1,
+:root[data-visual="novo"] h2,
+:root[data-visual="novo"] h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Rótulo em caixa alta espaçada é ruído: no visual novo, caixa normal. */
+:root[data-visual="novo"] .uppercase {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+:root[data-visual="novo"] .card {
+  backdrop-filter: none;
+}
+
+:root[data-visual="novo"] .card:hover {
+  @apply border-borda;
+}
+
+:root[data-visual="novo"] .cta:hover {
+  transform: none;
+}
+
+:root[data-visual="novo"] .cta:active {
+  transform: scale(0.97);
+}
+
+:root[data-visual="novo"] .nav-link.active {
+  @apply bg-veu/[0.06] text-tinta-forte;
+  box-shadow: inset 3px 0 0 theme("colors.acento.DEFAULT");
+}
+
+:root[data-visual="novo"] .sidebar {
+  @apply border-borda bg-fundo-elevado;
+  backdrop-filter: none;
+}
+
+:root[data-visual="novo"] .marca-logo {
+  @apply h-9 w-9 rounded-campo bg-tinta-forte text-fundo shadow-none;
+}
+
+:root[data-visual="novo"] .table th {
+  @apply font-medium;
+}
+
+:root[data-visual="novo"] .table tbody tr:hover {
+  @apply bg-veu/[0.03];
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Interação (components/interacao.tsx, components/Avisos.tsx) — fase 2.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .cabecalho-pagina {
+    @apply flex flex-wrap items-end justify-between gap-4;
+  }
+
+  .cabecalho-titulo {
+    @apply m-0 font-display text-[28px] font-semibold leading-tight text-tinta-forte;
+  }
+
+  .cabecalho-descricao {
+    @apply mb-0 mt-1.5 max-w-[64ch] text-base leading-relaxed text-tinta-suave;
+  }
+
+  .etapas ol {
+    @apply m-0 flex list-none flex-wrap gap-x-2 gap-y-2 p-0;
+  }
+
+  .etapa {
+    @apply flex items-center gap-2 text-sm text-tinta-suave;
+  }
+
+  .etapa + .etapa::before {
+    content: "";
+    @apply mr-1 inline-block h-px w-6 bg-borda-forte;
+  }
+
+  .etapa-marca {
+    @apply grid h-7 w-7 shrink-0 place-items-center rounded-full border border-borda-forte text-[13px] font-semibold;
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .etapa-marca svg {
+    @apply h-3.5 w-3.5;
+  }
+
+  .etapa-atual {
+    @apply font-semibold text-tinta-forte;
+  }
+
+  .etapa-atual .etapa-marca {
+    @apply border-tinta-forte bg-tinta-forte text-fundo;
+  }
+
+  .etapa-feita .etapa-marca {
+    @apply border-limite-ok bg-limite-ok text-sobre-acento;
+  }
+
+  .barra-indeterminada {
+    @apply relative h-1.5 w-full overflow-hidden rounded-full bg-veu/[0.08];
+  }
+
+  .barra-indeterminada span {
+    @apply absolute inset-y-0 w-1/3 rounded-full bg-acento;
+    animation: indeterminada 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .estado-vazio {
+    @apply flex flex-col items-center rounded-card border border-dashed border-borda-forte px-6 py-14 text-center;
+  }
+
+  .estado-vazio-icone {
+    @apply mb-4 grid h-12 w-12 place-items-center rounded-full bg-veu/[0.06] text-tinta-suave;
+  }
+
+  .estado-vazio-icone svg {
+    @apply h-6 w-6;
+  }
+
+  .avisos {
+    @apply pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(380px,calc(100vw-32px))] flex-col gap-2;
+  }
+
+  .aviso {
+    @apply pointer-events-auto flex items-start gap-3 rounded-card border border-borda-forte bg-fundo-elevado p-3.5 text-[15px] text-tinta shadow-flutuante;
+    animation: aviso-entrar 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .aviso-sucesso {
+    @apply border-limite-ok/40;
+  }
+
+  .aviso-erro {
+    @apply border-limite-estourado-borda;
+  }
+
+  .aviso-icone {
+    @apply grid h-6 w-6 shrink-0 place-items-center rounded-full bg-limite-ok text-sobre-acento;
+  }
+
+  .aviso-icone svg {
+    @apply h-3.5 w-3.5;
+  }
+
+  .aviso-fechar {
+    @apply -m-1 grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-campo border-none bg-transparent text-tinta-suave;
+  }
+
+  .aviso-fechar:hover {
+    @apply bg-veu/[0.06] text-tinta-forte;
+  }
+
+  .aviso-fechar:focus-visible {
+    @apply shadow-foco outline-none;
+  }
+
+  .aviso-fechar svg {
+    @apply h-4 w-4;
+  }
+
+  /* Painel de trabalho (envio, revisão, conversa): superfície da folha. */
+  .painel {
+    @apply rounded-card border border-borda bg-fundo-elevado p-6;
+  }
+
+  .painel-lista {
+    padding: 0;
+  }
+
+  /* Indica se o campo veio da leitura da nota ou precisa ser preenchido. */
+  .campo-origem {
+    @apply ml-2 rounded-full px-2 py-px align-[1px] text-[12px] font-medium;
+  }
+
+  .campo-origem-lido {
+    @apply bg-veu/[0.06] text-tinta-suave;
+  }
+
+  .campo-origem-falta {
+    @apply bg-limite-atencao-suave text-limite-atencao;
+  }
+
+  .escolha {
+    @apply flex min-h-[64px] flex-1 cursor-pointer flex-col items-start justify-center gap-0.5 rounded-campo border border-borda-forte bg-transparent px-4 py-3 text-left font-sans text-tinta;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .escolha:hover {
+    @apply border-tinta-suave;
+  }
+
+  .escolha:focus-visible {
+    @apply shadow-foco outline-none;
+  }
+
+  .escolha[aria-pressed="true"] {
+    @apply border-tinta-forte bg-veu/[0.04];
+    box-shadow: inset 0 0 0 1px theme("colors.tinta.forte");
+  }
+
+  .digitando span {
+    @apply h-2 w-2 rounded-full bg-tinta-suave;
+    animation: digitando 1.2s ease-in-out infinite;
+  }
+
+  .digitando span:nth-child(2) {
+    animation-delay: 150ms;
+  }
+
+  .digitando span:nth-child(3) {
+    animation-delay: 300ms;
+  }
+
+  .tabela-rolavel {
+    /* `relative`: texto só para leitor de tela (`sr-only`, posição absoluta)
+     * dentro da tabela passa a ser medido aqui, e não alarga a página. */
+    @apply relative -mx-1 overflow-x-auto px-1;
+    overflow-wrap: normal;
+  }
+
+  .tabela-rolavel td,
+  .tabela-rolavel th {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .tabela-rolavel .num,
+  .tabela-rolavel .tabular-nums {
+    white-space: nowrap;
+  }
+
+  .num {
+    @apply text-right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes indeterminada {
+  from {
+    left: -35%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes aviso-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes digitando {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Responsivo do visual novo. Faixas: celular < 640 px, tablet 640-1023 px,
+ * desktop >= 1024 px. Abaixo de 1024 px o menu lateral vira uma barra no topo
+ * com botão que abre o menu por cima do conteúdo (components/Layout.tsx).
+ * ------------------------------------------------------------------------- */
+.app-shell-compacta {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+}
+
+.barra-topo {
+  @apply sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-borda bg-fundo-elevado;
+  padding: 10px 16px;
+}
+
+.barra-topo .marca {
+  @apply mb-0 px-0;
+}
+
+.botao-menu {
+  @apply grid h-11 w-11 cursor-pointer place-items-center rounded-campo border border-borda bg-transparent text-tinta-forte;
+  transition: background-color 150ms ease;
+}
+
+.botao-menu:hover {
+  @apply bg-veu/[0.06];
+}
+
+.botao-menu:focus-visible {
+  @apply shadow-foco outline-none;
+}
+
+.botao-menu svg {
+  @apply h-5 w-5;
+}
+
+:root[data-visual="novo"] .sidebar.menu-gaveta {
+  @apply fixed bottom-0 left-0 top-0 z-50 overflow-y-auto border-r border-borda shadow-flutuante;
+  width: min(320px, 86vw);
+  height: 100dvh;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  visibility: hidden;
+  transform: translateX(-100%);
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    visibility 0s linear 220ms;
+}
+
+:root[data-visual="novo"] .sidebar.menu-gaveta.menu-aberto {
+  visibility: visible;
+  transform: none;
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.menu-fundo {
+  @apply fixed inset-0 z-[45] bg-black/40;
+  animation: aparecer 180ms ease;
+}
+
+:root[data-visual="novo"] .menu-gaveta .nav-link {
+  @apply min-h-[48px] text-[15px];
+}
+
+/* Espaço lateral do conteúdo acompanha a largura. */
+:root[data-visual="novo"] .content {
+  padding: 40px 36px 56px;
+}
+
+@media (max-width: 1023px) {
+  :root[data-visual="novo"] .content {
+    padding: 28px 24px 48px;
+  }
+}
+
+@media (max-width: 639px) {
+  :root[data-visual="novo"] .content {
+    padding: 20px 16px 40px;
+  }
+
+  /* Régua: em tela de celular, um mês sim e outro não no rótulo. */
+  .regua-meses span:nth-child(even) {
+    visibility: hidden;
+  }
+
+  .regua-trilho {
+    @apply mt-6 h-11;
+  }
+
+  .cabecalho-titulo {
+    @apply text-2xl;
+  }
+
+  /* Painéis com lista ou tabela (p-0) cuidam do próprio recuo. */
+  /* Painéis com lista ou tabela (`.painel-lista`) cuidam do próprio recuo.
+   * Não usar `.p-0` como marcador: o `@apply p-0` de outras regras arrastaria
+   * este seletor junto. */
+  .painel:not(.painel-lista) {
+    padding: 1rem;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Etapas quebram em mais de uma linha: o traço entre elas some. */
+  .etapa + .etapa::before {
+    display: none;
+  }
+
+  .etapas ol {
+    @apply gap-x-4;
+  }
+}
+
+/* Texto longo sem espaço (OCR, CNPJ, URL) quebra em vez de alargar a tela. */
+:root[data-visual="novo"] .chat-bubble,
+:root[data-visual="novo"] .painel {
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------------------
+ * Configurações (pages/ConfiguracoesPage.tsx, #91)
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .campo-config {
+    @apply min-w-0;
+  }
+
+  .campo-com-unidade {
+    @apply flex items-stretch overflow-hidden rounded-campo border border-borda bg-veu/[0.03];
+  }
+
+  .campo-com-unidade:focus-within {
+    @apply border-acento/60 shadow-foco;
+  }
+
+  .campo-com-unidade input {
+    @apply min-w-0 flex-1 rounded-none border-0 bg-transparent shadow-none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .campo-com-unidade input:focus {
+    @apply shadow-none;
+  }
+
+  .campo-unidade {
+    @apply flex shrink-0 items-center whitespace-nowrap bg-veu/[0.04] px-3 text-sm text-tinta-suave;
+  }
+
+  .campo-unidade-antes {
+    @apply border-r border-borda;
+  }
+
+  .interruptor {
+    @apply mb-0 inline-flex min-h-[44px] cursor-pointer items-center gap-3 font-normal text-tinta;
+  }
+
+  .interruptor input {
+    @apply h-5 w-9 shrink-0 cursor-pointer appearance-none rounded-full border-0 bg-borda-forte p-0;
+    position: relative;
+    transition: background-color 150ms ease;
+  }
+
+  .interruptor input::after {
+    content: "";
+    @apply absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-fundo-elevado;
+    transition: transform 150ms ease;
+  }
+
+  .interruptor input:checked {
+    @apply bg-acento;
+  }
+
+  .interruptor input:checked::after {
+    transform: translateX(16px);
+  }
+
+  .interruptor input:focus-visible {
+    @apply shadow-foco outline-none;
+  }
+
+  .barra-salvar {
+    @apply sticky bottom-0 z-30 -mx-1 mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-borda bg-fundo px-1 py-4;
+  }
+}

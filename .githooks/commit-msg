@@ -1,0 +1,33 @@
+#!/bin/sh
+# Valida a mensagem de commit contra a especificação Conventional Commits,
+# o mesmo padrão que o portão "Histórico e segredos" da CI exige nos PRs.
+# Falhar aqui custa segundos; falhar na CI custa um ciclo inteiro.
+
+arquivo="$1"
+primeira_linha=$(head -n 1 "$arquivo")
+
+# Ignora mensagens geradas pelo próprio git (merge, revert, fixup, squash)
+case "$primeira_linha" in
+    "Merge "*|"Revert "*|"fixup!"*|"squash!"*|"#"*) exit 0 ;;
+esac
+
+padrao='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .{1,80}$'
+
+if ! printf '%s' "$primeira_linha" | grep -qE "$padrao"; then
+    echo "" >&2
+    echo "  Mensagem fora do padrão Conventional Commits." >&2
+    echo "" >&2
+    echo "  Recebido: $primeira_linha" >&2
+    echo "" >&2
+    echo "  Formato:  <tipo>(<escopo>): <resumo no imperativo>" >&2
+    echo "  Tipos:    feat fix docs style refactor perf test build ci chore revert" >&2
+    echo "  Escopos:  auth billing limits documents agent insights notifications" >&2
+    echo "            worker gateway frontend dashboard rag contexto flags" >&2
+    echo "            observabilidade infra adr" >&2
+    echo "" >&2
+    echo "  Exemplo:  feat(dashboard): adiciona gauge do limite anual" >&2
+    echo "" >&2
+    exit 1
+fi
+
+exit 0

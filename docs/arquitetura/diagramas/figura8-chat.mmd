@@ -1,0 +1,35 @@
+%% Figura 8 do artigo — chat com o agente fiscal.
+%% Conferido contra o código em 19/11/2026: frontend/src/pages/AgentPage.tsx e
+%% agent-orchestrator/app/main.py (chat, get_limits_summary, embed_text,
+%% retrieve_knowledge, retrieve_document_chunks) e agent-orchestrator/app/consumo.py.
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant FE as Frontend (React)
+    participant GW as API Gateway
+    participant AG as Orquestrador do Agente
+    participant LI as Limites
+    participant DB as agent_db (pgvector)
+    participant GE as Gemini API
+    participant BI as Cobrança
+
+    U->>FE: envia pergunta no chat
+    FE->>GW: POST /agent/chat {email, message}
+    GW->>AG: encaminha a requisição
+    AG->>LI: GET /summary/{email}
+    LI-->>AG: resumo do ano (vendas, compras, limite, alerta)
+    AG->>GE: embedding da pergunta (gemini-embedding-001)
+    GE-->>AG: vetor de 768 dimensões
+    AG->>DB: 3 regras do MEI + 3 trechos de documentos mais próximos
+    DB-->>AG: trechos recuperados
+    AG->>AG: monta o prompt com dados e trechos
+    AG->>GE: generate_content(prompt)
+    GE-->>AG: resposta em linguagem natural
+    AG-)BI: POST /usage (embedding e geração)<br/>só com a flag billing-tokens-reais, em segundo plano
+    AG-->>GW: {reply, sources}
+    GW-->>FE: resposta JSON
+    FE->>GW: POST /billing/tokens/consume (chat_message)
+    GW->>BI: encaminha (débito ignorado no modo ilimitado)
+    BI-->>GW: saldo atualizado
+    GW-->>FE: resposta JSON
+    FE->>U: exibe a resposta e as fontes citadas

@@ -1,0 +1,170 @@
+name: CD
+
+# Entrega contínua até o registro de imagens. O "deploy" do TG II é o
+# `docker compose up` local, então o que a CD garante é que exista sempre
+# uma imagem imutável, assinada e rastreável para cada commit da main.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+env:
+  REGISTRY: ghcr.io
+  APP_DIR: app
+
+jobs:
+  publicar-imagens:
+    name: Publicar · ${{ matrix.servico }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - servico: auth
+            contexto: services/auth
+          - servico: billing
+            contexto: services/billing
+          - servico: limits
+            contexto: services/limits
+          - servico: documents
+            contexto: services/documents
+          - servico: agent-orchestrator
+            contexto: services/agent-orchestrator
+          - servico: insights
+            contexto: services/insights
+          - servico: notifications
+            contexto: services/notifications
+          - servico: worker
+            contexto: services/worker
+          - servico: api-gateway
+            contexto: services/api-gateway
+          - servico: frontend
+            contexto: services/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Autenticar no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calcular tags e labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.servico }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Construir e publicar
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.APP_DIR }}/${{ matrix.contexto }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.servico }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.servico }}
+          provenance: true
+          sbom: true
+
+      # A proveniência SLSA e o SBOM já vão anexados à imagem no registro,
+      # gerados pelo buildkit nas opções provenance e sbom acima. O passo
+      # abaixo é diferente: ele persiste o atestado no armazenamento de
+      # atestados do GitHub, recurso indisponível em repositório privado de
+      # conta pessoal. Fica condicionado à visibilidade para que a CD não
+      # reprove por uma limitação de plano — as imagens já foram publicadas
+      # quando este passo roda.
+      - name: Atestar proveniência da imagem
+        if: github.event.repository.visibility == 'public'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.servico }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Aviso sobre o atestado
+        if: github.event.repository.visibility != 'public'
+        run: |
+          echo "::notice::Atestado de proveniência do GitHub pulado: indisponível em repositório privado de conta pessoal. A imagem continua carregando proveniência SLSA e SBOM anexados pelo buildkit."
+
+      - name: Escanear a imagem publicada (Trivy)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.servico }}:sha-${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: "0" # vira "1" quando a base de imagens estiver limpa
+          ignore-unfixed: true
+
+  # ------------------------------------------------------------------
+  # Registra o deployment no GitHub para alimentar as métricas DORA
+  # (frequência de implantação e lead time saem daqui).
+  # ------------------------------------------------------------------
+  registrar-deployment:
+    name: Registrar implantação
+    runs-on: ubuntu-latest
+    needs: publicar-imagens
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Criar deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'compose-local',
+              required_contexts: [],
+              auto_merge: false,
+              description: 'Imagens publicadas no GHCR e prontas para docker compose pull',
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'success',
+              description: 'Imagens disponíveis no GHCR',
+            });
+
+  # ------------------------------------------------------------------
+  # Gera o arquivo de composição que consome as imagens do registro,
+  # em vez de reconstruir localmente.
+  # ------------------------------------------------------------------
+  publicar-compose:
+    name: Publicar compose de release
+    runs-on: ubuntu-latest
+    needs: publicar-imagens
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Anexar docker-compose.release.yml ao release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.APP_DIR }}/docker-compose.release.yml
+            ${{ env.APP_DIR }}/.env.example
+          generate_release_notes: true

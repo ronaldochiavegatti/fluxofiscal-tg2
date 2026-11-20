@@ -1,0 +1,19 @@
+# Configuração do gitleaks (hook .githooks/pre-commit).
+# Parte das regras padrão e só libera valores de exemplo conhecidos, que são
+# públicos de propósito e não valem em nenhum ambiente real: o instalar.sh da
+# VPS gera segredos novos e aleatórios no .env de lá.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores de desenvolvimento assumidamente inseguros"
+regexes = [
+  '''unleash-insecure-dev(-frontend)?-secret''',
+  '''troque-esta-senha''',
+  '''fiscalflow-dev:ZmlzY2FsZmxvdy1pbnNlY3VyZS1kZXYta21zLWtleSE=''',
+  '''<sua_chave_aqui>''',
+]
+paths = [
+  '''(^|/)package-lock\.json$''',
+]

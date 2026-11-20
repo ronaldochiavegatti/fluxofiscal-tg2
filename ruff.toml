@@ -1,0 +1,89 @@
+# Configuração de lint e formatação de todos os serviços Python.
+#
+# Fica na raiz do repositório porque o ruff resolve a configuração subindo a
+# árvore de diretórios a partir de cada arquivo analisado. Um único arquivo aqui
+# vale para os cinco serviços, sem cópia por serviço.
+
+target-version = "py312"
+line-length = 100
+
+exclude = [
+    ".venv",
+    "__pycache__",
+    "node_modules",
+]
+
+[lint]
+select = [
+    "E",   # pycodestyle: erros
+    "W",   # pycodestyle: avisos
+    "F",   # pyflakes: import não usado, variável não definida
+    "I",   # isort: ordenação de imports
+    "UP",  # pyupgrade: sintaxe moderna (List -> list, Optional -> | None)
+    "B",   # flake8-bugbear: armadilhas comuns
+    "C4",  # comprehensions desnecessariamente verbosas
+    "SIM", # simplificações óbvias
+    "DTZ", # datetime sem fuso declarado
+    "T20", # print() esquecido
+    "PT",  # convenções de pytest
+]
+
+ignore = [
+    # O formatador já cuida do comprimento de linha. Manter E501 ligado só
+    # produz conflito entre as duas ferramentas.
+    "E501",
+]
+
+# DTZ, T20 e PT entraram como bloqueantes na US-04, junto com a suíte de
+# testes: `datetime.utcnow()` saiu de Limits, Billing e Documents, e as
+# convenções de pytest só passaram a fazer sentido quando houve testes.
+#
+# Ainda de fora, com motivo:
+#   ANN  anotações de tipo obrigatórias — entra junto com o mypy bloqueante
+#   S    bandit — as URLs de banco no código carregam senha de desenvolvimento
+#        e disparam S105/S106 em massa; sai da frente quando a configuração
+#        migrar para variável de ambiente
+
+[lint.flake8-bugbear]
+# `Depends()` em argumento padrão é O idioma do FastAPI, não um defeito.
+# Sem esta lista, o B008 reprova praticamente toda rota do projeto.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+    "fastapi.Security",
+    "Depends",
+    "Query",
+    "Path",
+    "Body",
+    "Header",
+    "Cookie",
+    "Form",
+    "File",
+    "Security",
+]
+
+[lint.isort]
+known-first-party = ["app", "dominio"]
+
+[lint.per-file-ignores]
+# Testes podem usar asserção simples e nomes longos de cenário.
+"**/tests/**" = ["S101", "E402"]
+# Scripts de benchmark em tests/benchmarks comunicam pelo stdout — print é a
+# saída, não depuração — e chamam git com argumentos fixos.
+"tests/benchmarks/**" = ["S101", "E402", "T201", "S603", "S607"]
+# Scripts de linha de comando em tools/ idem, e chamam git/gh com argumentos
+# fixos (não entrada do usuário).
+"tools/**" = ["T201", "S603", "S607"]
+"tools/**/test_*.py" = ["S101", "S603", "E402", "T201"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true

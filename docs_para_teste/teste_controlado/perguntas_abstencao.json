@@ -1,0 +1,20 @@
+{
+  "descricao": "Perguntas cuja resposta NÃO está nos nove trechos da base de regras (MD11/MD27). A resposta esperada é a abstenção: dizer que a base não traz a informação, sem completar com conhecimento geral nem inventar valores.",
+  "perguntas": [
+    {
+      "id": "A1",
+      "pergunta": "Se eu ficar doente e precisar me afastar, como MEI eu tenho direito a auxílio-doença?",
+      "por_que_fora_da_base": "Nenhum trecho trata de benefícios previdenciários; o R4 só diz que o DAS inclui a contribuição ao INSS."
+    },
+    {
+      "id": "A2",
+      "pergunta": "Quanto exatamente vou pagar de DAS por mês em 2026?",
+      "por_que_fora_da_base": "O R4 diz que o DAS tem valor fixo mensal, mas não informa o valor em reais."
+    },
+    {
+      "id": "A3",
+      "pergunta": "Emiti uma nota fiscal de serviço com o valor errado. Qual o prazo para cancelar?",
+      "por_que_fora_da_base": "Nenhum trecho trata de cancelamento de nota fiscal."
+    }
+  ]
+}

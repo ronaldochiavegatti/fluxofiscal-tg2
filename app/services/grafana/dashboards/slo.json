@@ -1,0 +1,102 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalTags": [],
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Orçamento de erro consumido (30d)",
+      "description": "slo:orcamento:consumido — 0 = intacto, 1 = esgotado. Acima de 1 o SLO estourou o orçamento do mês.",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "slo:orcamento:consumido", "legendFormat": "{{slo}}" }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1.5,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "orange", "value": 0.9 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Alertas de queima ativos",
+      "description": "ALERTS para SLOQueimaDeOrcamento — SLO, janela e severidade de cada disparo.",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "ALERTS{alertname=\"SLOQueimaDeOrcamento\", alertstate=\"firing\"}",
+          "format": "table",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "title": "Taxa de erro do SLO — janela 1h",
+      "description": "slo:sli_erro:taxa1h por SLO. A linha tracejada de referência é o orçamento de erro de cada objetivo.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "slo:sli_erro:taxa1h", "legendFormat": "{{slo}} — 1h" },
+        { "expr": "slo:sli_erro:taxa5m", "legendFormat": "{{slo}} — 5m" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+        }
+      }
+    },
+    {
+      "title": "Disponibilidade observada (30d) vs. objetivo",
+      "description": "1 - slo:sli_erro:taxa30d. Compare com o objetivo em docs/observabilidade/slos.yaml.",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "1 - slo:sli_erro:taxa30d", "legendFormat": "{{slo}}" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 4,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.99 },
+              { "color": "green", "value": 0.995 }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["fluxofiscal", "slo", "observabilidade"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "America/Sao_Paulo",
+  "title": "FluxoFiscal — SLO e Orçamento de Erro",
+  "uid": "fluxofiscal-slo",
+  "version": 1
+}

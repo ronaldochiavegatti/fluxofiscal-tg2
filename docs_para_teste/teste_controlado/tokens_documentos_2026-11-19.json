@@ -1,0 +1,32 @@
+[
+  {
+    "item": "04_venda_nfse.txt",
+    "registrado_entrada": 1559,
+    "registrado_saida": 112,
+    "api_prompt_token_count": 1559,
+    "api_candidates_token_count": 112,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1671,
+    "count_tokens_entrada": 1559
+  },
+  {
+    "item": "01_venda_nfse.png",
+    "registrado_entrada": 1580,
+    "registrado_saida": 109,
+    "api_prompt_token_count": 1580,
+    "api_candidates_token_count": 109,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1689,
+    "count_tokens_entrada": 1580
+  },
+  {
+    "item": "12_compra_nfce_foto.jpg",
+    "registrado_entrada": 1546,
+    "registrado_saida": 112,
+    "api_prompt_token_count": 1546,
+    "api_candidates_token_count": 112,
+    "api_thoughts_token_count": 0,
+    "api_total_token_count": 1658,
+    "count_tokens_entrada": 1546
+  }
+]

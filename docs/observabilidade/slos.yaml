@@ -1,0 +1,271 @@
+# Objetivos de nível de serviço da plataforma FluxoFiscal
+#
+# Este arquivo é a fonte da verdade dos SLOs. É lido por:
+#   - tools/observabilidade/gerar_alertas.py, que gera as regras do Prometheus
+#   - tests/benchmarks/verificar_slos.py, que reprova o pipeline noturno
+#   - o painel "SLO e orçamento de erro" do Grafana
+#
+# Alterar um SLO exige Pull Request com justificativa. SLO que se ajusta
+# sozinho quando é violado não é objetivo, é decoração.
+
+versao: 1
+janela_padrao: 30d
+
+# ---------------------------------------------------------------------------
+# Disponibilidade
+# ---------------------------------------------------------------------------
+disponibilidade:
+  # O `sli` é a definição legível. As chaves `metrica` / `selector_total` /
+  # `selector_erro` são o que tools/observabilidade/gerar_alertas.py consome
+  # para montar as regras de queima de orçamento em múltiplas janelas — sem
+  # elas o gerador teria de reescrever a expressão do `sli` por regex.
+  - id: gateway-disponivel
+    descricao: >
+      Requisições atendidas sem erro do servidor. É o SLO mais abrangente: se
+      este cair, o usuário percebe.
+    sli: |
+      sum(rate(http_requests_total{status!~"5.."}[5m]))
+      /
+      sum(rate(http_requests_total[5m]))
+    metrica: http_requests_total
+    selector_total: ""
+    selector_erro: 'status=~"5.."'
+    objetivo: 0.995        # 3h39min de indisponibilidade por mês
+    janela: 30d
+    severidade: critica
+    nota: >
+      Medido nos cinco serviços atrás do gateway, agregando todas as séries. O
+      nginx do gateway ainda não expõe /metrics; até lá esta é a melhor
+      aproximação de "requisição servida sem erro de servidor" ponta a ponta.
+
+  - id: limits-disponivel
+    descricao: >
+      O Limits é a fonte da verdade fiscal. Dashboard, agente e relatório em PDF
+      dependem dele, então o objetivo é mais rigoroso que o do gateway.
+    sli: |
+      sum(rate(http_requests_total{job="limits",status!~"5.."}[5m]))
+      /
+      sum(rate(http_requests_total{job="limits"}[5m]))
+    metrica: http_requests_total
+    selector_total: 'job="limits"'
+    selector_erro: 'job="limits",status=~"5.."'
+    objetivo: 0.999
+    janela: 30d
+    severidade: critica
+
+  - id: insights-disponivel
+    descricao: >
+      Degradação aceitável: sem o Insights o dashboard cai para a visão básica
+      lendo direto do Limits, então o objetivo é mais frouxo.
+    sli: |
+      sum(rate(http_requests_total{job="insights",status!~"5.."}[5m]))
+      /
+      sum(rate(http_requests_total{job="insights"}[5m]))
+    metrica: http_requests_total
+    selector_total: 'job="insights"'
+    selector_erro: 'job="insights",status=~"5.."'
+    objetivo: 0.99
+    janela: 30d
+    severidade: alta
+    nota: >
+      O serviço Insights entra na Onda 3 (ADR-0009). Até lá a regra é gerada mas
+      fica sem dados — não dispara e não atrapalha.
+
+# ---------------------------------------------------------------------------
+# Latência
+# ---------------------------------------------------------------------------
+latencia:
+  - id: resumo-anual-rapido
+    descricao: >
+      Consulta mais chamada da plataforma. Uma agregação sobre uma tabela
+      indexada não tem desculpa para demorar.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(http_server_duration_seconds_bucket{
+          service="limits", route="/summary/{email}"}[5m])))
+    objetivo_p95_s: 0.3
+    objetivo_p99_s: 0.8
+    janela: 30d
+    severidade: alta
+
+  - id: dashboard-rapido
+    descricao: >
+      Payload completo do dashboard. Vem de projeção materializada, portanto
+      deve ser leitura de linhas prontas, não cálculo.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(http_server_duration_seconds_bucket{
+          service="insights", route="/dashboard/{email}"}[5m])))
+    objetivo_p95_s: 0.3
+    objetivo_p99_s: 1.0
+    janela: 30d
+    severidade: alta
+
+  - id: upload-aceito-rapido
+    descricao: >
+      Após o ADR-0003 o upload só grava e enfileira. O processamento pesado
+      saiu do caminho da requisição, então o alvo cai de 4,5s para 0,5s.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(http_server_duration_seconds_bucket{
+          service="documents", route="/upload"}[5m])))
+    objetivo_p95_s: 0.5
+    objetivo_p99_s: 1.5
+    janela: 30d
+    severidade: alta
+    nota: "Linha de base medida antes da mudança: p95 de 6,00s"
+
+  - id: extracao-concluida
+    descricao: >
+      Do enfileiramento ao estado "extraido". Substitui a latência síncrona
+      anterior como indicador de experiência do usuário no upload.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(documento_processamento_duracao_segundos_bucket[5m])))
+    objetivo_p95_s: 8.0
+    objetivo_p99_s: 15.0
+    janela: 30d
+    severidade: media
+
+  - id: chat-responde
+    descricao: >
+      Ponta a ponta do chat, incluindo embedding, busca híbrida, reordenação e
+      geração. Linha de base do artigo: 8,54s de média.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(http_server_duration_seconds_bucket{
+          service="agent-orchestrator", route="/chat"}[5m])))
+    objetivo_p95_s: 12.0
+    objetivo_p99_s: 20.0
+    janela: 30d
+    severidade: media
+    nota: "Depende de API externa; o orçamento de erro reflete essa dependência"
+
+# ---------------------------------------------------------------------------
+# Frescor — quanto tempo o dado leva para aparecer
+# ---------------------------------------------------------------------------
+frescor:
+  - id: projecao-atualizada
+    descricao: >
+      Da transação criada até a projeção do dashboard refletir a mudança.
+      É o preço da consistência eventual do ADR-0009, e ele é observável.
+    sli: |
+      histogram_quantile(0.95,
+        sum by (le) (rate(insights_atraso_projecao_segundos_bucket[5m])))
+    objetivo_p95_s: 2.0
+    janela: 7d
+    severidade: media
+
+  - id: fila-sem-acumulo
+    descricao: >
+      Idade da mensagem mais antiga não processada. Fila crescendo é sinal
+      antecedente de degradação, antes de qualquer erro aparecer.
+    sli: max(celery_fila_idade_mais_antiga_segundos)
+    objetivo_max_s: 60
+    janela: 7d
+    severidade: alta
+
+# ---------------------------------------------------------------------------
+# Correção — qualidade do que o sistema produz
+# ---------------------------------------------------------------------------
+correcao:
+  - id: extracao-acurada
+    descricao: >
+      Campos corretos sobre o conjunto de referência de 40 documentos, medido
+      todas as noites. Linha de base do artigo: 100% em 12 documentos.
+    fonte: pipeline noturno (tests/benchmarks/extracao.py)
+    objetivo_acuracia_campos: 0.90
+    objetivo_acuracia_valor: 0.95
+    janela: por execução
+    severidade: critica
+    nota: "O valor é o campo mais crítico: erro nele corrompe o cálculo do limite"
+
+  - id: rag-recupera
+    descricao: Acerto na primeira posição sobre o conjunto de 30 perguntas.
+    fonte: pipeline noturno (tests/benchmarks/rag.py)
+    objetivo_acerto_1a: 0.90
+    objetivo_acerto_5: 0.98
+    janela: por execução
+    severidade: alta
+
+  - id: agente-nao-inventa-numero
+    descricao: >
+      Valores citados pelo agente conferem com o Limits. Inegociável: um
+      assistente fiscal que erra o faturamento do próprio usuário é inútil.
+    fonte: pipeline noturno
+    objetivo_precisao_numerica: 1.0
+    janela: por execução
+    severidade: critica
+
+  - id: conciliacao-projecao
+    descricao: >
+      Totais do Insights conferem com o Limits. Detecta divergência do modelo
+      de leitura antes que o usuário perceba.
+    fonte: tarefa noturna de conciliação
+    objetivo_divergencia_maxima_reais: 0.01
+    janela: diaria
+    severidade: critica
+
+# ---------------------------------------------------------------------------
+# Custo — não é SLO clássico, mas é orçamento e merece alerta
+# ---------------------------------------------------------------------------
+custo:
+  - id: custo-llm-diario
+    descricao: Gasto estimado com a API do Gemini por dia.
+    sli: sum(increase(llm_custo_estimado_reais_total[1d]))
+    objetivo_max_reais_dia: 5.0
+    severidade: media
+
+  - id: custo-por-documento
+    descricao: Custo médio de processar um documento ponta a ponta.
+    sli: |
+      sum(increase(llm_custo_estimado_reais_total{operacao="extracao"}[1d]))
+      /
+      sum(increase(documentos_processados_total[1d]))
+    objetivo_max_reais: 0.05
+    severidade: baixa
+    nota: "Alimenta a discussão de viabilidade comercial do artigo"
+
+# ---------------------------------------------------------------------------
+# Alertas por queima de orçamento de erro
+#
+# Duas janelas por severidade, conforme o Site Reliability Workbook. A janela
+# curta evita alerta tardio; a longa evita alerta por ruído. As duas precisam
+# estar queimando ao mesmo tempo para disparar.
+# ---------------------------------------------------------------------------
+queima_de_orcamento:
+  - nome: queima-rapida
+    fator: 14.4                 # consome 2% do orçamento mensal em 1h
+    janela_longa: 1h
+    janela_curta: 5m
+    severidade: pagina
+    runbook: error-budget-burn.md
+    aplica_a: [gateway-disponivel, limits-disponivel]
+
+  - nome: queima-media
+    fator: 6                    # consome 5% do orçamento em 6h
+    janela_longa: 6h
+    janela_curta: 30m
+    severidade: pagina
+    runbook: error-budget-burn.md
+    aplica_a: [gateway-disponivel, limits-disponivel, insights-disponivel]
+
+  - nome: queima-lenta
+    fator: 1                    # consome 10% do orçamento em 3 dias
+    janela_longa: 3d
+    janela_curta: 6h
+    severidade: ticket
+    runbook: error-budget-burn.md
+    aplica_a: [gateway-disponivel, limits-disponivel, insights-disponivel]
+
+# ---------------------------------------------------------------------------
+# Política de orçamento de erro
+# ---------------------------------------------------------------------------
+politica:
+  orcamento_esgotado:
+    - "Congelar entregas de funcionalidade; só correção e confiabilidade entram"
+    - "Registrar análise de causa raiz sem culpado no repositório"
+    - "Revisar o SLO: ele é realista, ou o sistema é que precisa mudar?"
+  orcamento_folgado:
+    - "Sobrou orçamento por dois meses seguidos indica objetivo frouxo demais"
+    - "Considerar apertar o alvo, ou assumir mais risco nas entregas"

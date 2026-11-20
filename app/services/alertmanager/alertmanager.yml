@@ -1,0 +1,37 @@
+# Alertmanager — roteamento dos alertas de SLO (US-13 / ADR-0007).
+#
+# Sobe só com o overlay docker-compose.observability.yml. UI em :9093.
+#
+# Os receivers ainda são "de registro" (sem envio): o destino final é o centro
+# de notificações in-app do próprio produto, que entra na US-29c (Onda 4). Até
+# lá, o valor aqui é ver o alerta agrupado, inibido e roteado por severidade —
+# que é o que a defesa precisa demonstrar.
+
+route:
+  receiver: registro
+  group_by: ["slo", "janela"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers: ['severity="pagina"']
+      receiver: registro-pagina
+      repeat_interval: 1h
+      continue: false
+    - matchers: ['severity="ticket"']
+      receiver: registro-ticket
+
+receivers:
+  - name: registro
+  - name: registro-pagina
+  - name: registro-ticket
+
+# Se a queima rápida (1h/5m) já disparou para um SLO, não faz sentido também
+# paginar pela queima média (6h/30m) do mesmo SLO — é o mesmo incidente.
+inhibit_rules:
+  - source_matchers: ['janela="queima-rapida"']
+    target_matchers: ['janela="queima-media"']
+    equal: ["slo"]
+  - source_matchers: ['severity="pagina"']
+    target_matchers: ['severity="ticket"']
+    equal: ["slo"]

@@ -1,0 +1,144 @@
+# Pilha de observabilidade — US-12 (rastreamento distribuído) e ADR-0007.
+#
+# Sobe SÓ quando explicitamente combinada com o Compose base:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d --build
+#
+# O Compose padrão e a CI NÃO carregam este arquivo. Sem ele:
+#   - OTEL_TRACES_ENABLED fica "false" e o rastreamento é inerte, sem custo;
+#   - os cinco contêineres extras (Collector, Tempo, Loki, Promtail, Grafana)
+#     não pesam no fluxo de quem só quer rodar a aplicação.
+#
+# Com ele, o salto painel -> rastro -> log funciona dentro do Grafana:
+#   Grafana (3001) -> Prometheus (métricas) + Tempo (rastros) + Loki (logs)
+
+services:
+  # --- os serviços passam a exportar rastros para o Collector ---
+  auth:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: auth
+  billing:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: billing
+  documents:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: documents
+  limits:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: limits
+  agent:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: agent-orchestrator
+  insights:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: insights
+  notifications:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: notifications
+  worker:
+    environment:
+      OTEL_TRACES_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_SERVICE_NAME: worker
+
+  # --- coletor: ponto único onde o dado pessoal é removido do rastro ---
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.116.0
+    container_name: otel_collector
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./services/otel-collector/config.yaml:/etc/otel/config.yaml:ro
+    depends_on:
+      tempo:
+        condition: service_started
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./services/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo_data:/var/tempo
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: loki
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    container_name: promtail
+    command: ["-config.file=/etc/promtail/promtail.yaml"]
+    volumes:
+      - ./services/promtail/promtail.yaml:/etc/promtail/promtail.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      loki:
+        condition: service_started
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    volumes:
+      - ./services/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9093/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_FEATURE_TOGGLES_ENABLE: traceToMetrics
+    volumes:
+      - ./services/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./services/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
+
+volumes:
+  tempo_data:
+  grafana_data:
